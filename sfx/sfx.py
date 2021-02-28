@@ -131,11 +131,10 @@ class SFX(commands.Cog):
     @checks.mod()
     async def addsfx(self, ctx, name: str, link: str=None):
         """Adds a new sound.
-
         Either upload the file as a Discord attachment and make your comment
         `[p]addsfx <name>`, or use `[p]addsfx <name> <direct-URL-to-file>`.
         """
-        cfg_sounds = await self.config.guild(ctx.guild).sounds()
+        guild_sounds = await self.config.guild(ctx.guild).sounds()
 
         if str(ctx.guild.id) not in os.listdir(self.sound_base):
             os.makedirs(os.path.join(self.sound_base, str(ctx.guild.id)))
@@ -166,7 +165,7 @@ class SFX(commands.Cog):
 
         filepath = os.path.join(self.sound_base, str(ctx.guild.id), filename)
 
-        if name in cfg_sounds.keys():
+        if name in guild_sounds.keys():
             await ctx.send('A sound with that name already exists. Please choose another name and try again.')
             return
 
@@ -179,8 +178,8 @@ class SFX(commands.Cog):
             f.write(await new_sound.read())
             f.close()
 
-        cfg_sounds[name] = filename
-        await self.config.guild(ctx.guild).sounds.set(cfg_sounds)
+        guild_sounds[name] = filename
+        await self.config.guild(ctx.guild).sounds.set(guild_sounds)
 
         await ctx.send(f'Sound {name} added.')
 
@@ -318,9 +317,11 @@ class SFX(commands.Cog):
             await ctx.send("```None```")
 
     @commands.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def myvoice(self, ctx):
         """Change your TTS voice."""
-        await ctx.send("Coming Soon")
+        embed = discord.Embed(title="click here to test voices", colour=await ctx.embed_colour(), url="https://tts.kaogurai.xyz")
+        await ctx.send(embed=embed)
 
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
