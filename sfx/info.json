@@ -1,7 +1,7 @@
 {
     "author" : ["baiumbg"],
     "short" : "Allow users to play TTS audio.",
-    "requirements" : ["easygTTS", "red-lavalink", "pydub", "aiohttp"],
+    "requirements" : ["aiofiles", "red-lavalink", "aiohttp"],
     "tags" : ["tts", "audio"],
     "disabled" : false
 }

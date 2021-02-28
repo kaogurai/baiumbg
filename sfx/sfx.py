@@ -7,6 +7,8 @@ import random
 import lavalink
 import aiohttp
 import easygTTS
+import aiofiles
+import urllib.parse
 
 class SFX(commands.Cog):
     """Plays uploaded sounds or text-to-speech."""
@@ -19,9 +21,7 @@ class SFX(commands.Cog):
         self.session = aiohttp.ClientSession()
         self.gtts = easygTTS.gtts(session=self.session)
         user_config = {
-            'lang': "en",
-            'provider': "",
-            'voice': ""
+            'voice': "nanotts:en-US"
         }
         guild_config = {
             'sounds': {}
@@ -29,7 +29,7 @@ class SFX(commands.Cog):
         global_config = {
             'sounds': {}
         }
-        self.config.register_guild(**user_config)
+        self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
         self.config.register_global(**global_config)
         lavalink.register_event_listener(self.ll_check)
@@ -45,16 +45,26 @@ class SFX(commands.Cog):
         """
         Plays the given text as TTS in your current voice channel.
         """
-
+        
         if not ctx.author.voice or not ctx.author.voice.channel:
             await ctx.send('You are not connected to a voice channel.')
             return
         
-        audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(12)) + '.mp3')
-        gtts = easygTTS.gtts(session=self.session) # i'm planning to stop using this soon, but it's a better alternative for now so my bot won't crash
-        tts = await gtts.get(text=text)
-        with open(audio_file, "wb") as f:
-            f.write(tts)
+        audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
+        author_voice = await self.config.user(ctx.author).voice()
+
+        encoded_string = text.encode("ascii", "ignore")
+        decoded_string = encoded_string.decode()
+        if not decoded_string:
+            await ctx.send("That's not a valid message, sorry.")
+            return
+        wrapped_text = urllib.parse.quote(decoded_string)
+        wrapped_voice = urllib.parse.quote(author_voice)
+        async with self.session.get(f"https://tts.kaogurai.xyz/api/tts?voice={wrapped_voice}&text={wrapped_text}") as request:
+            f = await aiofiles.open(audio_file, mode='wb')
+            await f.write(await request.read())
+            await f.close()
+
         await self._play_sfx(ctx.author.voice.channel, audio_file, True)
 
     @commands.command()
