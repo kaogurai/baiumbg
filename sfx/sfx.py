@@ -320,7 +320,7 @@ class SFX(commands.Cog):
     @commands.command()
     async def myvoice(self, ctx):
         """Change your TTS voice."""
-        await ctx.send("Coming Soon.")
+        await ctx.send("Coming Soon")
 
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
