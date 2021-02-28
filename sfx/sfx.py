@@ -18,12 +18,18 @@ class SFX(commands.Cog):
         self.sound_base = (data_manager.cog_data_path(self) / 'sounds').as_posix()
         self.session = aiohttp.ClientSession()
         self.gtts = easygTTS.gtts(session=self.session)
+        user_config = {
+            'lang': "en",
+            'provider': "",
+            'voice': ""
+        }
         guild_config = {
             'sounds': {}
         }
         global_config = {
             'sounds': {}
         }
+        self.config.register_guild(**user_config)
         self.config.register_guild(**guild_config)
         self.config.register_global(**global_config)
         lavalink.register_event_listener(self.ll_check)
@@ -45,7 +51,7 @@ class SFX(commands.Cog):
             return
         
         audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(12)) + '.mp3')
-        gtts = easygTTS.gtts(session=self.session)
+        gtts = easygTTS.gtts(session=self.session) # i'm planning to stop using this soon, but it's a better alternative for now so my bot won't crash
         tts = await gtts.get(text=text)
         with open(audio_file, "wb") as f:
             f.write(tts)
@@ -53,9 +59,10 @@ class SFX(commands.Cog):
 
     @commands.command()
     @commands.cooldown(rate=1, per=1, type=discord.ext.commands.cooldowns.BucketType.guild)
-    async def sfx(self, ctx, soundname: str):
+    async def sfx(self, ctx, sound: str):
         """
-        Plays an existing sound in your current voice channel.
+        Plays an existing sound in your current voice channel. 
+        If a guild SFX exists with the same name as a global one, the guild SFX will be played.
         """
 
         if not ctx.author.voice or not ctx.author.voice.channel:
@@ -66,17 +73,31 @@ class SFX(commands.Cog):
             os.makedirs(os.path.join(self.sound_base, str(ctx.guild.id)))
 
         guild_sounds = await self.config.guild(ctx.guild).sounds()
-        global_sounds = await self.config.sounds() # not used yet
-        if soundname not in guild_sounds.keys():
-            await ctx.send(f'Sound `{soundname}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
-            return
+        global_sounds = await self.config.sounds() 
 
-        filepath = os.path.join(self.sound_base, str(ctx.guild.id), guild_sounds[soundname])
+        if sound not in guild_sounds.keys():
+            if sound not in global_sounds.keys():
+                await ctx.send(f'Sound `{sound}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
+                return
+
+        if sound in guild_sounds.keys():
+            filepath = os.path.join(self.sound_base, str(ctx.guild.id), guild_sounds[sound])
+        else: 
+            filepath = os.path.join(self.sound_base, global_sounds[sound])
+
         if not os.path.exists(filepath):
-            del guild_sounds[soundname]
-            await self.config.guild(ctx.guild).sounds.set(guild_sounds)
-            await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of sounds.')
-            return
+            if sound in guild_sounds.keys():
+                del guild_sounds[sound]
+                await self.config.guild(ctx.guild).sounds.set(guild_sounds)
+                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of sounds.')
+                return
+            if sound in global_sounds.keys():
+                del global_sounds[sound]
+                await self.config.sounds.set(guild_sounds)
+                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of sounds.')
+                return
+            else:
+                await ctx.send("Sorry, I can't seem to find that SFX.")
 
         await self._play_sfx(ctx.author.voice.channel, filepath)
 
@@ -259,6 +280,10 @@ class SFX(commands.Cog):
         for page in paginator.pages:
             await ctx.send(page)
 
+    @commands.command()
+    async def myvoice(self, ctx):
+        """Change your TTS voice."""
+        await ctx.send("Coming Soon.")
 
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
