@@ -278,19 +278,30 @@ class SFX(commands.Cog):
         if str(ctx.guild.id) not in os.listdir(self.sound_base):
             os.makedirs(os.path.join(self.sound_base, str(ctx.guild.id)))
 
-        cfg_sounds = await self.config.guild(ctx.guild).sounds()
+        guild_sounds = await self.config.guild(ctx.guild).sounds()
+        global_sounds = await self.config.sounds()
 
-        if len(cfg_sounds.items()) == 0:
+        if (len(guild_sounds.items()) + len(global_sounds.items())) == 0:
             await ctx.send(f'No sounds found. Use `{ctx.prefix}addsfx` to add one.')
             return
 
-        paginator = discord.ext.commands.help.Paginator()
-        for soundname, filepath in cfg_sounds.items():
-            paginator.add_line(soundname)
+        guild_paginator = discord.ext.commands.help.Paginator()
+        global_paginator = discord.ext.commands.help.Paginator()
+        for soundname, filepath in guild_sounds.items():
+            guild_paginator.add_line(soundname)
+        for soundname, filepath in global_sounds.items():
+            global_paginator.add_line(soundname)
 
-        await ctx.send('Sounds for this server:')
-        for page in paginator.pages:
+        await ctx.send('Guild sounds for this server:')
+        for page in guild_paginator.pages:
             await ctx.send(page)
+        if not guild_paginator.pages:
+            await ctx.send("```None```")
+        await ctx.send('Global sounds for this server:')
+        for page in global_paginator.pages:
+            await ctx.send(page)
+        if not global_paginator.pages:
+            await ctx.send("```None```")
 
     @commands.command()
     async def myvoice(self, ctx):
