@@ -1,14 +1,14 @@
 from redbot.core import commands, checks, data_manager, Config
 import tempfile
 import discord
-import asyncio
 import os
 import random
 import lavalink
 import aiohttp
-import easygTTS
 import aiofiles
 import urllib.parse
+import pydub
+
 
 class SFX(commands.Cog):
     """Plays uploaded sounds or text-to-speech."""
@@ -19,7 +19,6 @@ class SFX(commands.Cog):
         self.config = Config.get_conf(self, identifier=134621854878007296)
         self.sound_base = (data_manager.cog_data_path(self) / 'sounds').as_posix()
         self.session = aiohttp.ClientSession()
-        self.gtts = easygTTS.gtts(session=self.session)
         user_config = {
             'voice': "nanotts:en-US"
         }
@@ -45,7 +44,7 @@ class SFX(commands.Cog):
         """
         Plays the given text as TTS in your current voice channel.
         """
-        
+
         if not ctx.author.voice or not ctx.author.voice.channel:
             await ctx.send('You are not connected to a voice channel.')
             return
@@ -64,6 +63,11 @@ class SFX(commands.Cog):
             f = await aiofiles.open(audio_file, mode='wb')
             await f.write(await request.read())
             await f.close()
+
+        audio_data = pydub.AudioSegment.from_mp3(audio_file)
+        silence = pydub.AudioSegment.silent(duration=1000)
+        padded_audio = silence + audio_data + silence
+        padded_audio.export(audio_file, format='wav')
 
         await self._play_sfx(ctx.author.voice.channel, audio_file, True)
 
