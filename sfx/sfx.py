@@ -89,13 +89,25 @@ class SFX(commands.Cog):
             if sound in guild_sounds.keys():
                 del guild_sounds[sound]
                 await self.config.guild(ctx.guild).sounds.set(guild_sounds)
-                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of sounds.')
-                return
+                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of guild sounds.')
+                if sound in global_sounds.keys():
+                    del global_sounds[sound]
+                    await self.config.sounds.set(global_sounds)
+                    await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of global sounds.')
+                    return
+                else:
+                    return
             if sound in global_sounds.keys():
                 del global_sounds[sound]
-                await self.config.sounds.set(guild_sounds)
-                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of sounds.')
-                return
+                await self.config.sounds.set(global_sounds)
+                await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of global sounds.')
+                if sound in global_sounds.keys():
+                    del global_sounds[sound]
+                    await self.config.sounds.set(global_sounds)
+                    await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of guild sounds.')
+                    return
+                else:
+                    return
             else:
                 await ctx.send("Sorry, I can't seem to find that SFX.")
 
