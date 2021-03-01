@@ -317,9 +317,10 @@ class SFX(commands.Cog):
             await ctx.send("```None```")
 
     @commands.command()
-    @commands.cooldown(rate=1, per=15)
+    @commands.cooldown(rate=1, per=30)
     async def myvoice(self, ctx, voice: str):
-        """Change your TTS voice."""
+        """Change your TTS voice.
+        To find a voice, either to go https://tts.kaogurai.xyz and view them, or type `[p]listvoices`"""
         async with self.session.get(f"https://tts.kaogurai.xyz/api/voices") as request:
             response = await request.json()
         if voice in response:
@@ -329,13 +330,24 @@ class SFX(commands.Cog):
             await ctx.send(f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command and test them on https://tts.kaogurai.xyz")
         
     @commands.command()
-    @commands.cooldown(rate=1, per=5)
+    @commands.cooldown(rate=1, per=10)
     @commands.bot_has_permissions(embed_links=True)
-    async def listvoices(self, ctx):
+    async def listvoices(self, ctx, lang=None):
         """List all the TTS voices."""
-        async with self.session.get(f"https://tts.kaogurai.xyz/api/voices") as request:
+        async with self.session.get("https://tts.kaogurai.xyz/api/languages") as langrequest:
+            langresponse = await langrequest.json()
+        if lang == None:
+            lang = "en"
+        else:
+            if lang not in langresponse:
+                await ctx.send("That's not a valid language.")
+                return
+        async with self.session.get(f"https://tts.kaogurai.xyz/api/voices?language={lang}") as request:
             response = await request.json()
-        await ctx.send("https://tts.kaogurai.xyz/api/voices")
+        message = ""
+        for obj in response:
+            message = (message + "\n" + obj)
+        await ctx.send(message)
 
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
