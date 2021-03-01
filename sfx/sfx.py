@@ -1,4 +1,5 @@
 from redbot.core import commands, checks, data_manager, Config
+from redbot.core.utils.chat_formatting import humanize_list
 import tempfile
 import discord
 import os
@@ -23,7 +24,8 @@ class SFX(commands.Cog):
             'voice': "nanotts:en-US"
         }
         guild_config = {
-            'sounds': {}
+            'sounds': {},
+            'channels': []
         }
         global_config = {
             'sounds': {}
@@ -333,7 +335,8 @@ class SFX(commands.Cog):
     @commands.cooldown(rate=1, per=10)
     @commands.bot_has_permissions(embed_links=True)
     async def listvoices(self, ctx, lang=None):
-        """List all the TTS voices."""
+        """List all the TTS voices.
+        By default, this shows the english languages, but you can view a different language by specifying the code from the `[p]listlangs` command."""
         async with self.session.get("https://tts.kaogurai.xyz/api/languages") as langrequest:
             langresponse = await langrequest.json()
         if lang == None:
@@ -348,7 +351,104 @@ class SFX(commands.Cog):
         for obj in response:
             message = (message + "\n" + obj)
         await ctx.send(message)
+    
+    @commands.command()
+    @commands.cooldown(rate=1, per=10)
+    @commands.bot_has_permissions(embed_links=True)
+    async def listlangs(self, ctx, lang=None):
+        """List all the languages."""
+        async with self.session.get("https://tts.kaogurai.xyz/api/languages") as langrequest:
+            langresponse = await langrequest.json()
+        await ctx.send(humanize_list(langresponse))
 
+    @commands.group()
+    @commands.guild_only()
+    @commands.admin()
+    async def ttschannel(self, ctx):
+        """Configure automatic TTS channels."""
+         
+    @ttschannel.command()
+    async def add(self, ctx, channel: discord.TextChannel):
+        """Add a channel for automatic TTS."""
+        channel_list = await self.config.guild(ctx.guild).channels()
+        if channel.id not in channel_list:
+            channel_list.append(channel.id)
+            await self.config.guild(ctx.guild).channels.set(channel_list)
+            await ctx.send(f"Okay, I've added {channel.mention} to the config.")
+        else:
+            await ctx.send(f"{channel.mention} was already in the config, did you mean to remove it?")
+
+    @ttschannel.command()
+    async def remove(self, ctx, channel: discord.TextChannel):
+        """Remove a channel for automatic TTS."""
+        channel_list = await self.config.guild(ctx.guild).channels()
+        if channel.id in channel_list:
+            channel_list.remove(channel.id)
+            await self.config.guild(ctx.guild).channels.set(channel_list)
+            await ctx.send(f"Okay, I've removed {channel.mention} from the config.")
+        else:
+            await ctx.send(f"I couldn't find {channel.mention} in the config, did you mean to add it?")
+
+    @ttschannel.command()
+    async def clear(self, ctx):
+        """Remove all the channels for automatic TTS."""
+        channel_list = await self.config.guild(ctx.guild).channels()
+        if not channel_list: 
+            await ctx.send("There's no channels in the config.")
+        else:
+            await self.config.guild(ctx.guild).channels.set([])
+            await ctx.send("Ok, I've removed them all.")
+
+    @ttschannel.command()
+    async def list(self, ctx):
+        """Show all the channels for automatic TTS."""
+        channel_list = await self.config.guild(ctx.guild).channels()
+        if not channel_list: 
+            await ctx.send("There's no channels in the config.")
+        else:
+            lolidk = ""
+            for obj in channel_list:
+                lolidk = lolidk + "\n <#" + str(obj) + "> - " + str(obj)
+            embed = discord.Embed(title = "Automatic TTS Channels", color = await ctx.embed_colour(), description = lolidk)
+            await ctx.send(embed=embed)
+    
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        if not message.guild:
+            return
+        if message.author.bot:
+            return
+        channel_list = await self.config.guild(message.guild).channels()
+        if not channel_list:
+            return
+        if message.channel.id not in channel_list:
+            return
+
+        if not message.author.voice or not message.author.voice.channel:
+            await message.channel.send('You are not connected to a voice channel.')
+            return
+        
+        audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
+        author_voice = await self.config.user(message.author).voice()
+
+        encoded_string = message.content.encode("ascii", "ignore")
+        decoded_string = encoded_string.decode()
+        if not decoded_string:
+            await message.channel.send("That's not a valid message, sorry.")
+            return
+        wrapped_text = urllib.parse.quote(decoded_string)
+        wrapped_voice = urllib.parse.quote(author_voice)
+        async with self.session.get(f"https://tts.kaogurai.xyz/api/tts?voice={wrapped_voice}&text={wrapped_text}") as request:
+            f = await aiofiles.open(audio_file, mode='wb')
+            await f.write(await request.read())
+            await f.close()
+
+        audio_data = pydub.AudioSegment.from_mp3(audio_file)
+        silence = pydub.AudioSegment.silent(duration=1000)
+        padded_audio = silence + audio_data + silence
+        padded_audio.export(audio_file, format='wav')
+
+        await self._play_sfx(message.author.voice.channel, audio_file, True)
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
