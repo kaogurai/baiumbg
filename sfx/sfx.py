@@ -344,7 +344,7 @@ class SFX(commands.Cog):
             if lang not in langresponse:
                 await ctx.send("That's not a valid language.")
                 return
-        async with self.session.get(f"httss://tts.kaogurai.xyz/api/voices?language={lang}") as request:
+        async with self.session.get(f"https://tts.kaogurai.xyz/api/voices?language={lang}") as request:
             response = await request.json()
         message = []
         for obj in response:
