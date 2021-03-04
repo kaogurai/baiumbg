@@ -333,23 +333,20 @@ class SFX(commands.Cog):
         
     @commands.command()
     @commands.cooldown(rate=1, per=10)
-    async def listvoices(self, ctx, lang=None):
+    async def listvoices(self, ctx, lang='en'):
         """List all the TTS voices.
         By default, this shows the english languages, but you can view a different language by specifying the code from the `[p]listlangs` command."""
         async with self.session.get("https://tts.kaogurai.xyz/api/languages") as langrequest:
             langresponse = await langrequest.json()
-        if lang == None:
-            lang = "en"
-        else:
-            if lang not in langresponse:
-                await ctx.send("That's not a valid language.")
-                return
+        if lang not in langresponse:
+            await ctx.send("That's not a valid language.")
+            return
         async with self.session.get(f"https://tts.kaogurai.xyz/api/voices?language={lang}") as request:
             response = await request.json()
         message = []
         for obj in response:
             message.append(obj)
-        embed = discord.Embed(title = "All TTS Voices", color = await ctx.embed_colour(), description = humanize_list(message))
+        embed = discord.Embed(title = "Available TTS Voices", color = await ctx.embed_colour(), description = humanize_list(message))
         await ctx.send(embed=embed)
     
     @commands.command()
