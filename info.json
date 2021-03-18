@@ -1,6 +1,6 @@
 {
-    "author" : ["baiumbg"],
-    "name" : "useless-cogs",
-    "short" : "A bunch of useless cogs",
-    "description" : "A bunch of useless cogs (and some questionably useful ones)."
+    "author" : ["baiumbg", "aleclol"],
+    "name" : "sfx",
+    "short" : "Fork of baiumbg's SFX cog",
+    "description" : "Fork of baiumbg's SFX cog"
 }

@@ -1,16 +1,9 @@
-# baiumbg-Cogs
-A bunch of useless (and some questionably useful) cogs for [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot) (V3)
+# sfx cog
 
-* **SFX** - Upload and play sounds through Red's voice. TTS included.
-* **Duel** - Duel other members to the death! Port of [calebj](https://github.com/calebj/calebj-cogs)'s Duel cog. Replaced complete randomness with psuedo-random items and equipment.
-* **Nickometer** - Measure the lameness of people's nicknames. Port of [tekulvw](https://github.com/tekulvw)'s Nickometer cog.
-* **Zalgo** - HE COMES. Port of [calebj](https://github.com/calebj)'s Zalgo cog.
-* **Penis** - Measure your penis size against other members! Port of [Twentysix26](https://github.com/Twentysix26)'s Penis cog.
-* **MXL** - A bunch of Median XL utilities like auction searching, item pricechecking and armory dumping.
+this is a fork of [baiumbg](https://github.com/baiumbg/baiumbg-Cogs)'s original SFX cog for Red-DiscordBot
 
-## Credits
-* [Twentysix26](https://github.com/Twentysix26) and everyone else who has contributed to Red Bot.
-* [Twentysix26](https://github.com/Twentysix26) again for his implementation of the Penis cog.
-* [flapjax](https://github.com/flapjax) - for his implementation of the SFX cog.
-* [calebj](https://github.com/calebj) - for the original implementation of the Duel and Zalgo cogs.
-* [tekulvw](https://github.com/tekulvw) - for his implementation of the Nickometer cog.
+due to the backend TTS library, gTTS, using the python library requests, it caused many blocking issues
+
+the TTS command has been rewritten to use my self-hosted [openTTS](https://github.com/synesthesiam/opentts) server, but of course you can change it to use yours with the `[p]ttsurl <url>` command (plz do this so my VPS doesn't die lol)
+
+in addition, i have added TTS channels and global SFX
