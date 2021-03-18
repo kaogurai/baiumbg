@@ -44,6 +44,9 @@ class SFX(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def ttsurl(self, ctx, url: str):
+        """
+        Changes the URL for the TTS API.
+        """
         await self.config.url.set(url)
         await ctx.tick()
 
@@ -251,7 +254,9 @@ class SFX(commands.Cog):
     @commands.command()
     @checks.mod()
     async def delsfx(self, ctx, soundname: str):
-        """Deletes an existing sound."""
+        """
+        Deletes an existing sound.
+        """
 
         if str(ctx.guild.id) not in os.listdir(self.sound_base):
             os.makedirs(os.path.join(self.sound_base, str(ctx.guild.id)))
@@ -275,7 +280,9 @@ class SFX(commands.Cog):
     @commands.command()
     @checks.is_owner()
     async def delglobalsfx(self, ctx, soundname: str):
-        """Deletes an existing global sound."""
+        """
+        Deletes an existing global sound.
+        """
 
         global_sounds = await self.config.sounds()
 
@@ -296,7 +303,9 @@ class SFX(commands.Cog):
     @commands.command()
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.guild)
     async def listsfx(self, ctx):
-        """Prints all available sounds for this server."""
+        """
+        Prints all available sounds for this server.
+        """
 
         if str(ctx.guild.id) not in os.listdir(self.sound_base):
             os.makedirs(os.path.join(self.sound_base, str(ctx.guild.id)))
@@ -329,7 +338,8 @@ class SFX(commands.Cog):
     @commands.command()
     @commands.cooldown(rate=1, per=30)
     async def myvoice(self, ctx, voice: str):
-        """Change your TTS voice.
+        """
+        Changes your TTS voice.
         To find a voice, either to go https://tts.kaogurai.xyz and view them, or type `[p]listvoices`"""
         url = await self.config.url()
         async with self.session.get(f"{url}api/voices") as request:
@@ -343,8 +353,10 @@ class SFX(commands.Cog):
     @commands.command()
     @commands.cooldown(rate=1, per=10)
     async def listvoices(self, ctx, lang='en'):
-        """List all the TTS voices.
-        By default, this shows the english languages, but you can view a different language by specifying the code from the `[p]listlangs` command."""
+        """
+        Lists all the TTS voices.
+        By default, this shows the english languages, but you can view a different language by specifying the code from the `[p]listlangs` command.
+        """
         url = await self.config.url()
         async with self.session.get(f"{url}api/languages") as langrequest:
             langresponse = await langrequest.json()
@@ -362,7 +374,9 @@ class SFX(commands.Cog):
     @commands.command()
     @commands.cooldown(rate=1, per=10)
     async def listlangs(self, ctx, lang=None):
-        """List all the languages."""
+        """
+        Lists all the TTS languages.
+        """
         url = await self.config.url()
         async with self.session.get(f"{url}api/languages") as langrequest:
             langresponse = await langrequest.json()
@@ -373,7 +387,9 @@ class SFX(commands.Cog):
     @commands.guild_only()
     @commands.admin()
     async def ttschannel(self, ctx):
-        """Configure automatic TTS channels."""
+        """
+        Configures automatic TTS channels.
+        """
          
     @ttschannel.command()
     async def add(self, ctx, channel: discord.TextChannel):
@@ -388,7 +404,9 @@ class SFX(commands.Cog):
 
     @ttschannel.command()
     async def remove(self, ctx, channel: discord.TextChannel):
-        """Remove a channel for automatic TTS."""
+        """
+        Removes a channel for automatic TTS.
+        """
         channel_list = await self.config.guild(ctx.guild).channels()
         if channel.id in channel_list:
             channel_list.remove(channel.id)
@@ -399,7 +417,9 @@ class SFX(commands.Cog):
 
     @ttschannel.command()
     async def clear(self, ctx):
-        """Remove all the channels for automatic TTS."""
+        """
+        Removes all the channels for automatic TTS.
+        """
         channel_list = await self.config.guild(ctx.guild).channels()
         if not channel_list: 
             await ctx.send("There's no channels in the config.")
@@ -409,7 +429,9 @@ class SFX(commands.Cog):
 
     @ttschannel.command()
     async def list(self, ctx):
-        """Show all the channels for automatic TTS."""
+        """
+        Shows all the channels for automatic TTS.
+        """
         channel_list = await self.config.guild(ctx.guild).channels()
         if not channel_list: 
             await ctx.send("There's no channels in the config.")
