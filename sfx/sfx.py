@@ -99,10 +99,9 @@ class SFX(commands.Cog):
         guild_sounds = await self.config.guild(ctx.guild).sounds()
         global_sounds = await self.config.sounds() 
 
-        if sound not in guild_sounds.keys():
-            if sound not in global_sounds.keys():
-                await ctx.send(f'Sound `{sound}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
-                return
+        if sound not in guild_sounds.keys() and sound not in global_sounds.keys():
+            await ctx.send(f'Sound `{sound}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
+            return
 
         if sound in guild_sounds.keys():
             filepath = os.path.join(self.sound_base, str(ctx.guild.id), guild_sounds[sound])
@@ -118,9 +117,7 @@ class SFX(commands.Cog):
                     del global_sounds[sound]
                     await self.config.sounds.set(global_sounds)
                     await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of global sounds.')
-                    return
-                else:
-                    return
+                return
             if sound in global_sounds.keys():
                 del global_sounds[sound]
                 await self.config.sounds.set(global_sounds)
@@ -129,9 +126,7 @@ class SFX(commands.Cog):
                     del global_sounds[sound]
                     await self.config.sounds.set(global_sounds)
                     await ctx.send('Looks like this sound\'s file has gone missing! I\'ve removed it from the list of guild sounds.')
-                    return
-                else:
-                    return
+                return
             else:
                 await ctx.send("Sorry, I can't seem to find that SFX.")
 
@@ -169,7 +164,7 @@ class SFX(commands.Cog):
             return
 
         _, file_extension = os.path.splitext(filename)
-        if file_extension != '.wav' and file_extension != '.mp3':
+        if file_extension not in ['.wav', '.mp3']:
             await ctx.send('Only .wav and .mp3 sounds are currently supported.')
             return
 
@@ -184,10 +179,8 @@ class SFX(commands.Cog):
             return
 
         async with self.session.get(url) as new_sound:
-            f = open(filepath, 'wb')
-            f.write(await new_sound.read())
-            f.close()
-
+            with open(filepath, 'wb') as f:
+                f.write(await new_sound.read())
         guild_sounds[name] = filename
         await self.config.guild(ctx.guild).sounds.set(guild_sounds)
 
@@ -224,7 +217,7 @@ class SFX(commands.Cog):
             return
 
         _, file_extension = os.path.splitext(filename)
-        if file_extension != '.wav' and file_extension != '.mp3':
+        if file_extension not in ['.wav', '.mp3']:
             await ctx.send('Only .wav and .mp3 sounds are currently supported.')
             return
 
@@ -239,10 +232,8 @@ class SFX(commands.Cog):
             return
 
         async with self.session.get(url) as new_sound:
-            f = open(filepath, 'wb')
-            f.write(await new_sound.read())
-            f.close()
-
+            with open(filepath, 'wb') as f:
+                f.write(await new_sound.read())
         global_sounds[name] = filename
         await self.config.sounds.set(global_sounds)
 
@@ -353,9 +344,7 @@ class SFX(commands.Cog):
             return
         async with self.session.get(f"https://tts.kaogurai.xyz/api/voices?language={lang}") as request:
             response = await request.json()
-        message = []
-        for obj in response:
-            message.append(obj)
+        message = [obj for obj in response]
         embed = discord.Embed(title = "Available TTS Voices", color = await ctx.embed_colour(), description = humanize_list(message))
         await ctx.send(embed=embed)
     
