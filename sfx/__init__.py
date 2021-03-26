@@ -1,4 +1,3 @@
-from aiohttp.multipart import BadContentDispositionHeader
 from redbot.core.bot import Red
 from .sfx import SFX
 
