@@ -14,7 +14,8 @@ import pydub
 class SFX(commands.Cog):
     """Plays uploaded sounds or text-to-speech."""
 
-    def __init__(self):
+    def __init__(self, bot):
+        self.bot = bot
         self.last_track_info = None
         self.current_sfx = None
         self.config = Config.get_conf(self, identifier=134621854878007296)
@@ -78,7 +79,7 @@ class SFX(commands.Cog):
             await f.close()
 
         audio_data = pydub.AudioSegment.from_mp3(audio_file)
-        silence = pydub.AudioSegment.silent(duration=1000)
+        silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data + silence
         padded_audio.export(audio_file, format='wav')
 
@@ -475,7 +476,7 @@ class SFX(commands.Cog):
             await f.close()
 
         audio_data = pydub.AudioSegment.from_mp3(audio_file)
-        silence = pydub.AudioSegment.silent(duration=1000)
+        silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data + silence
         padded_audio.export(audio_file, format='wav')
 
@@ -484,6 +485,9 @@ class SFX(commands.Cog):
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
         track = (await player.get_tracks(query=filepath))[0]
+
+        lol = self.bot.get_channel(800600678841319444)
+        await lol.send(track.author)
 
         if player.current is None:
             player.queue.append(track)
