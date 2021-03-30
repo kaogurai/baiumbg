@@ -62,7 +62,7 @@ class SFX(commands.Cog):
             await ctx.send('You are not connected to a voice channel.')
             return
         
-        audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
+        audio_file = os.path.join(tempfile.gettempdir(), 'tts/', ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
         author_voice = await self.config.user(ctx.author).voice()
 
         encoded_string = text.encode("ascii", "ignore")
@@ -459,7 +459,7 @@ class SFX(commands.Cog):
             await message.channel.send('You are not connected to a voice channel.')
             return
         
-        audio_file = os.path.join(tempfile.gettempdir(), ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
+        audio_file = os.path.join(tempfile.gettempdir(), 'tts/', ''.join(random.choice('0123456789ABCDEF') for i in range(15)) + '.wav')
         author_voice = await self.config.user(message.author).voice()
 
         encoded_string = message.content.encode("ascii", "ignore")
