@@ -192,6 +192,11 @@ class SFX(commands.Cog):
             f.write(await new_sound.read())
             f.close()
 
+        audio_data = pydub.AudioSegment.from_file(filepath)
+        silence = pydub.AudioSegment.silent(duration=500)
+        padded_audio = silence + audio_data + silence
+        padded_audio.export(filepath)
+
         guild_sounds[name] = filename
         await self.config.guild(ctx.guild).sounds.set(guild_sounds)
 
@@ -246,6 +251,11 @@ class SFX(commands.Cog):
             f = open(filepath, 'wb')
             f.write(await new_sound.read())
             f.close()
+
+        audio_data = pydub.AudioSegment.from_file(filepath)
+        silence = pydub.AudioSegment.silent(duration=500)
+        padded_audio = silence + audio_data + silence
+        padded_audio.export(filepath)
 
         global_sounds[name] = filename
         await self.config.sounds.set(global_sounds)
