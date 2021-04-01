@@ -78,7 +78,7 @@ class SFX(commands.Cog):
             await f.write(await request.read())
             await f.close()
 
-        audio_data = pydub.AudioSegment.from_file(audio_file)
+        audio_data = pydub.AudioSegment.from_wav(audio_file)
         silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data + silence
         padded_audio.export(audio_file, format='wav')
