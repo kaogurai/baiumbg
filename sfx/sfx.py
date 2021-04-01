@@ -67,9 +67,15 @@ class SFX(commands.Cog):
 
         encoded_string = text.encode("ascii", "ignore")
         decoded_string = encoded_string.decode()
+
         if not decoded_string:
             await ctx.send("That's not a valid message, sorry.")
             return
+
+        if len(decoded_string) > 1000:
+            await ctx.send("Sorry, I only allow messages with 1000 characters or below to be spoken.")
+            return
+
         wrapped_text = urllib.parse.quote(decoded_string)
         wrapped_voice = urllib.parse.quote(author_voice)
         url = await self.config.url()
@@ -474,9 +480,15 @@ class SFX(commands.Cog):
 
         encoded_string = message.content.encode("ascii", "ignore")
         decoded_string = encoded_string.decode()
+
         if not decoded_string:
             await message.channel.send("That's not a valid message, sorry.")
             return
+
+        if len(decoded_string) > 1000:
+            await message.channel.send("Sorry, I only allow messages with 1000 characters or below to be spoken.")
+            return
+
         wrapped_text = urllib.parse.quote(decoded_string)
         wrapped_voice = urllib.parse.quote(author_voice)
         url = await self.config.url()
