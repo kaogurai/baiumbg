@@ -105,7 +105,7 @@ class SFX(commands.Cog):
 
         if sound not in guild_sounds.keys():
             if sound not in global_sounds.keys():
-                await ctx.send(f'Sound `{sound}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
+                await ctx.send(f'Sound **`{sound}`** does not exist. Try `{ctx.prefix}listsfx` for a list.')
                 return
 
         if sound in guild_sounds.keys():
@@ -200,7 +200,7 @@ class SFX(commands.Cog):
         guild_sounds[name] = filename
         await self.config.guild(ctx.guild).sounds.set(guild_sounds)
 
-        await ctx.send(f'Sound {name} added.')
+        await ctx.send(f'Sound **{name}** added.')
 
     @commands.command()
     @commands.is_owner()
@@ -260,7 +260,7 @@ class SFX(commands.Cog):
         global_sounds[name] = filename
         await self.config.sounds.set(global_sounds)
 
-        await ctx.send(f'Sound {name} added.')
+        await ctx.send(f'Sound **{name}** added.')
 
     @commands.command()
     @checks.mod()
@@ -275,7 +275,7 @@ class SFX(commands.Cog):
         cfg_sounds = await self.config.guild(ctx.guild).sounds()
 
         if soundname not in cfg_sounds.keys():
-            await ctx.send(f'Sound `{soundname}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
+            await ctx.send(f'Sound **{soundname}** does not exist. Try `{ctx.prefix}listsfx` for a list.')
             return
 
         filepath = os.path.join(self.sound_base, str(ctx.guild.id), cfg_sounds[soundname])
@@ -286,7 +286,7 @@ class SFX(commands.Cog):
         del cfg_sounds[soundname]
         await self.config.guild(ctx.guild).sounds.set(cfg_sounds)
 
-        await ctx.send(f'Sound {soundname} deleted.')
+        await ctx.send(f'Sound **{soundname}** deleted.')
 
     @commands.command()
     @checks.is_owner()
@@ -298,7 +298,7 @@ class SFX(commands.Cog):
         global_sounds = await self.config.sounds()
 
         if soundname not in global_sounds.keys():
-            await ctx.send(f'Sound `{soundname}` does not exist. Try `{ctx.prefix}listsfx` for a list.')
+            await ctx.send(f'Sound **{soundname}** does not exist. Try `{ctx.prefix}listsfx` for a list.')
             return
 
         filepath = os.path.join(self.sound_base, global_sounds[soundname])
@@ -309,7 +309,7 @@ class SFX(commands.Cog):
         del global_sounds[soundname]
         await self.config.sounds.set(global_sounds)
 
-        await ctx.send(f'Sound {soundname} deleted.')
+        await ctx.send(f'Sound **{soundname}** deleted.')
 
     @commands.command()
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.guild)
