@@ -22,7 +22,7 @@ class SFX(commands.Cog):
         self.sound_base = (data_manager.cog_data_path(self) / 'sounds').as_posix()
         self.session = aiohttp.ClientSession()
         user_config = {
-            'voice': "nanotts:en-US"
+            'voice': "flite:cmu_us_aew"
         }
         guild_config = {
             'sounds': {},
