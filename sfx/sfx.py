@@ -85,7 +85,7 @@ class SFX(commands.Cog):
             await f.close()
 
         audio_data = pydub.AudioSegment.from_file(audio_file)
-        silence = pydub.AudioSegment.silent(duration=500)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
 
@@ -199,7 +199,7 @@ class SFX(commands.Cog):
             f.close()
 
         audio_data = pydub.AudioSegment.from_file(filepath)
-        silence = pydub.AudioSegment.silent(duration=500)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(filepath)
 
@@ -259,7 +259,7 @@ class SFX(commands.Cog):
             f.close()
 
         audio_data = pydub.AudioSegment.from_file(filepath)
-        silence = pydub.AudioSegment.silent(duration=500)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(filepath)
 
@@ -498,7 +498,7 @@ class SFX(commands.Cog):
             await f.close()
 
         audio_data = pydub.AudioSegment.from_file(audio_file)
-        silence = pydub.AudioSegment.silent(duration=500)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
 
