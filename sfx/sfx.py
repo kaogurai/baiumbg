@@ -465,6 +465,11 @@ class SFX(commands.Cog):
             return
         if message.author.bot:
             return
+        if not message.channel.permissions_for(message.guild.me).send_messages:
+            return
+        if await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False:
+            return
+            
         channel_list = await self.config.guild(message.guild).channels()
         if not channel_list:
             return
