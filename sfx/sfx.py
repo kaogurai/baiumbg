@@ -353,7 +353,7 @@ class SFX(commands.Cog):
             await ctx.send("```None```")
 
     @commands.command()
-    @commands.cooldown(rate=1, per=30)
+    @commands.cooldown(rate=1, per=30, type=discord.ext.commands.cooldowns.BucketType.user)
     async def myvoice(self, ctx, voice: str):
         """
         Changes your TTS voice.
@@ -368,7 +368,7 @@ class SFX(commands.Cog):
             await ctx.send(f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command and test them on https://tts.kaogurai.xyz")
         
     @commands.command()
-    @commands.cooldown(rate=1, per=10)
+    @commands.cooldown(rate=1, per=10, type=discord.ext.commands.cooldowns.BucketType.user)
     async def listvoices(self, ctx, lang='en'):
         """
         Lists all the TTS voices.
@@ -389,7 +389,7 @@ class SFX(commands.Cog):
         await ctx.send(embed=embed)
     
     @commands.command()
-    @commands.cooldown(rate=1, per=10)
+    @commands.cooldown(rate=1, per=10, type=discord.ext.commands.cooldowns.BucketType.user)
     async def listlangs(self, ctx, lang=None):
         """
         Lists all the TTS languages.
