@@ -353,7 +353,7 @@ class SFX(commands.Cog):
             await ctx.send("```None```")
 
     @commands.command()
-    @commands.cooldown(rate=1, per=30, type=discord.ext.commands.cooldowns.BucketType.user)
+    @commands.cooldown(rate=1, per=15, type=discord.ext.commands.cooldowns.BucketType.user)
     async def myvoice(self, ctx, voice: str):
         """
         Changes your TTS voice.
