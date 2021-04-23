@@ -352,12 +352,20 @@ class SFX(commands.Cog):
         if not global_paginator.pages:
             await ctx.send("```None```")
 
-    @commands.command()
+    @commands.command(aliases=["setvoice"])
     @commands.cooldown(rate=1, per=15, type=discord.ext.commands.cooldowns.BucketType.user)
-    async def myvoice(self, ctx, voice: str):
+    async def myvoice(self, ctx, voice: str=None):
         """
         Changes your TTS voice.
-        To find a voice, either to go https://tts.kaogurai.xyz and view them, or type `[p]listvoices`"""
+        To find a voice, either to go https://tts.kaogurai.xyz and view them, or type `[p]listvoices`
+        If no voice is provided, it will show your current voice. 
+        """
+
+        current_voice = await self.config.user(ctx.author).voice()
+
+        if voice is None:
+            await ctx.send(f"Your current voice is **{current_voice}**.")
+
         url = await self.config.url()
         async with self.session.get(f"{url}api/voices") as request:
             response = await request.json()
