@@ -365,6 +365,7 @@ class SFX(commands.Cog):
 
         if voice is None:
             await ctx.send(f"Your current voice is **{current_voice}**.")
+            return
 
         url = await self.config.url()
         async with self.session.get(f"{url}api/voices") as request:
@@ -373,7 +374,7 @@ class SFX(commands.Cog):
             await self.config.user(ctx.author).voice.set(voice)
             await ctx.send(f"Your new TTS voice is: **{voice}**")
         else:
-            await ctx.send(f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command and test them on https://tts.kaogurai.xyz")
+            await ctx.send(f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command or on https://tts.kaogurai.xyz")
         
     @commands.command()
     @commands.cooldown(rate=1, per=10, type=discord.ext.commands.cooldowns.BucketType.user)
