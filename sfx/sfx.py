@@ -1,14 +1,11 @@
 from redbot.core import commands, checks, data_manager, Config
-from redbot.core.utils.chat_formatting import humanize_list
-from .api import *
+from .api import TTSAPI
 import tempfile
 import discord
 import os
 import random
 import lavalink
 import aiohttp
-import aiofiles
-import urllib.parse
 import pydub
 
 
@@ -22,9 +19,9 @@ class SFX(commands.Cog):
         self.config = Config.get_conf(self, identifier=134621854878007296)
         self.sound_base = (data_manager.cog_data_path(self) / "sounds").as_posix()
         self.session = aiohttp.ClientSession()
-        user_config = {"voice": "nanotts:en-US"}
+        user_config = {"voice": "clara", "speed": 0}
         guild_config = {"sounds": {}, "channels": []}
-        global_config = {"url": "https://tts.kaogurai.xyz/", "sounds": {}}
+        global_config = {"sounds": {}}
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
         self.config.register_global(**global_config)
@@ -34,15 +31,6 @@ class SFX(commands.Cog):
 
     def __unload(self):
         lavalink.unregister_event_listener(self.ll_check)
-
-    @commands.command()
-    @commands.is_owner()
-    async def ttsurl(self, ctx, url: str):
-        """
-        Changes the URL for the TTS API.
-        """
-        await self.config.url.set(url)
-        await ctx.tick()
 
     @commands.command()
     @commands.cooldown(
@@ -60,9 +48,10 @@ class SFX(commands.Cog):
         audio_file = os.path.join(
             tempfile.gettempdir(),
             "tts/",
-            "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".wav",
+            "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".mp3",
         )
         author_voice = await self.config.user(ctx.author).voice()
+        author_speed = await self.config.user(ctx.author).speed()
 
         encoded_string = text.encode("ascii", "ignore")
         decoded_string = encoded_string.decode()
@@ -77,22 +66,20 @@ class SFX(commands.Cog):
             )
             return
 
-        wrapped_text = urllib.parse.quote(decoded_string)
-        wrapped_voice = urllib.parse.quote(author_voice)
-        url = await self.config.url()
-        async with self.session.get(
-            f"{url}api/tts?voice={wrapped_voice}&text={wrapped_text}"
-        ) as request:
-            f = await aiofiles.open(audio_file, mode="wb")
-            await f.write(await request.read())
-            await f.close()
+        await TTSAPI.get_audio(
+            self, decoded_string, author_voice, author_speed, audio_file
+        )
 
         audio_data = pydub.AudioSegment.from_file(audio_file)
-        silence = pydub.AudioSegment.silent(duration=750)
+        silence = pydub.AudioSegment.silent(duration=1000)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
 
-        await self._play_sfx(ctx.author.voice.channel, audio_file, True)
+        try:
+            await self._play_sfx(ctx.author.voice.channel, audio_file, True)
+        except Exception:
+            await ctx.send("Lavalink doesn't seem to be ready, please try again later.")
+            return
 
     @commands.command()
     @commands.cooldown(
@@ -221,7 +208,7 @@ class SFX(commands.Cog):
             f.close()
 
         audio_data = pydub.AudioSegment.from_file(filepath)
-        silence = pydub.AudioSegment.silent(duration=750)
+        silence = pydub.AudioSegment.silent(duration=1000)
         padded_audio = silence + audio_data
         padded_audio.export(filepath)
 
@@ -284,9 +271,12 @@ class SFX(commands.Cog):
             f = open(filepath, "wb")
             f.write(await new_sound.read())
             f.close()
-
-        audio_data = pydub.AudioSegment.from_file(filepath)
-        silence = pydub.AudioSegment.silent(duration=750)
+        try:
+            audio_data = pydub.AudioSegment.from_file(filepath)
+        except pydub.CouldntDecodeError:
+            await ctx.send("Uh oh, an error occured. Please try again later.")
+            return
+        silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data
         padded_audio.export(filepath)
 
@@ -394,25 +384,50 @@ class SFX(commands.Cog):
     async def myvoice(self, ctx, voice: str = None):
         """
         Changes your TTS voice.
-        To find a voice, either to go https://tts.kaogurai.xyz and view them, or type `[p]listvoices`
+        Type `[p]listvoices` to view all possible voices.
         If no voice is provided, it will show your current voice.
         """
 
         current_voice = await self.config.user(ctx.author).voice()
 
         if voice is None:
-            await ctx.send(f"Your current voice is **{current_voice}**.")
+            await ctx.send(f"Your current voice is **{current_voice}**")
             return
-
-        url = await self.config.url()
-        async with self.session.get(f"{url}api/voices") as request:
-            response = await request.json()
-        if voice in response:
+        voice = voice.lower()
+        voices = TTSAPI.voices
+        if voice in voices:
             await self.config.user(ctx.author).voice.set(voice)
             await ctx.send(f"Your new TTS voice is: **{voice}**")
         else:
             await ctx.send(
-                f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command or on https://tts.kaogurai.xyz"
+                f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command."
+            )
+
+    @commands.command(aliases=["setspeed"])
+    @commands.cooldown(
+        rate=1, per=15, type=discord.ext.commands.cooldowns.BucketType.user
+    )
+    async def myspeed(self, ctx, speed: int = None):
+        """
+        Changes your TTS speed.
+        If no speed is provided, it will show your current speed.
+        The speed range is 0-10 (higher is faster, 5 is normal.)
+        """
+
+        current_speed = await self.config.user(ctx.author).voice()
+
+        if speed is None:
+            await ctx.send(f"Your current speed is **{current_speed}**")
+            return
+
+        speeds = TTSAPI.speeds
+
+        if speed in speeds:
+            await self.config.user(ctx.author).speed.set(speeds[speed])
+            await ctx.send(f"Your new TTS speed is: **{speed}**")
+        else:
+            await ctx.send(
+                "Sorry, that's not a valid speed. The speed range is 0-10 higher is faster, 5 is normal.)"
             )
 
     @commands.command()
@@ -422,44 +437,14 @@ class SFX(commands.Cog):
     async def listvoices(self, ctx, lang="en"):
         """
         Lists all the TTS voices.
-        By default, this shows the english languages, but you can view a different language by specifying the code from the `[p]listlangs` command.
         """
-        url = await self.config.url()
-        async with self.session.get(f"{url}api/languages") as langrequest:
-            langresponse = await langrequest.json()
-        if lang not in langresponse:
-            await ctx.send("That's not a valid language.")
-            return
-        async with self.session.get(
-            f"https://tts.kaogurai.xyz/api/voices?language={lang}"
-        ) as request:
-            response = await request.json()
-        message = []
-        for obj in response:
-            message.append(obj)
+        voices = TTSAPI.voices
         embed = discord.Embed(
-            title="Available TTS Voices",
-            color=await ctx.embed_colour(),
-            description=humanize_list(message),
+            title="Available TTS Voices", color=await ctx.embed_colour()
         )
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.cooldown(
-        rate=1, per=10, type=discord.ext.commands.cooldowns.BucketType.user
-    )
-    async def listlangs(self, ctx, lang=None):
-        """
-        Lists all the TTS languages.
-        """
-        url = await self.config.url()
-        async with self.session.get(f"{url}api/languages") as langrequest:
-            langresponse = await langrequest.json()
-        embed = discord.Embed(
-            title="All TTS Languages",
-            color=await ctx.embed_colour(),
-            description=humanize_list(langresponse),
-        )
+        for voice in voices:
+            value = voices[voice]["gender"] + " - " + voices[voice]["language"]
+            embed.add_field(name=voice, value=value, inline=False)
         await ctx.send(embed=embed)
 
     @commands.group()
@@ -556,6 +541,7 @@ class SFX(commands.Cog):
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".wav",
         )
         author_voice = await self.config.user(message.author).voice()
+        author_speed = await self.config.user(message.author).speed()
 
         encoded_string = message.content.encode("ascii", "ignore")
         decoded_string = encoded_string.decode()
@@ -570,22 +556,26 @@ class SFX(commands.Cog):
             )
             return
 
-        wrapped_text = urllib.parse.quote(decoded_string)
-        wrapped_voice = urllib.parse.quote(author_voice)
-        url = await self.config.url()
-        async with self.session.get(
-            f"{url}api/tts?voice={wrapped_voice}&text={wrapped_text}"
-        ) as request:
-            f = await aiofiles.open(audio_file, mode="wb")
-            await f.write(await request.read())
-            await f.close()
-
-        audio_data = pydub.AudioSegment.from_file(audio_file)
-        silence = pydub.AudioSegment.silent(duration=750)
+        await TTSAPI.get_audio(
+            self, decoded_string, author_voice, author_speed, audio_file
+        )
+        try:
+            audio_data = pydub.AudioSegment.from_file(audio_file)
+        except pydub.CouldntDecodeError:
+            await message.channel.send(
+                "Uh oh, an error occured. Please try again later."
+            )
+            return
+        silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
-
-        await self._play_sfx(message.author.voice.channel, audio_file, True)
+        try:
+            await self._play_sfx(message.author.voice.channel, audio_file, True)
+        except Exception:
+            await message.channel.send(
+                "Lavalink doesn't seem to be ready, please try again later."
+            )
+            return
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
