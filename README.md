@@ -1,9 +1,10 @@
 # sfx cog
 
-this is a fork of [baiumbg](https://github.com/baiumbg/baiumbg-Cogs)'s original SFX cog for Red-DiscordBot
+this is a fork of [baiumbg](https://github.com/baiumbg/baiumbg-Cogs)'s SFX cog for Red-DiscordBot
 
-due to the backend TTS library, gTTS, using the python library requests, it caused many blocking issues
+just to make this repository more simple, i've removed all the other cogs from here
 
-the TTS command has been rewritten to use my self-hosted [openTTS](https://github.com/synesthesiam/opentts) server, but of course you can change it to use another server with the `[p]ttsurl <url>` command (plz do this so my VPS doesn't die lol)
-
-in addition, i have added TTS channels and global SFX
+## changelog
+- tts channels
+- global sfx
+- non-requests tts (async)
