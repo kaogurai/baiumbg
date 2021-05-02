@@ -71,7 +71,7 @@ class SFX(commands.Cog):
         )
 
         audio_data = pydub.AudioSegment.from_file(audio_file)
-        silence = pydub.AudioSegment.silent(duration=1000)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
 
@@ -208,7 +208,7 @@ class SFX(commands.Cog):
             f.close()
 
         audio_data = pydub.AudioSegment.from_file(filepath)
-        silence = pydub.AudioSegment.silent(duration=1000)
+        silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(filepath)
 
@@ -341,9 +341,6 @@ class SFX(commands.Cog):
         await ctx.send(f"Sound **{soundname}** deleted.")
 
     @commands.command()
-    @commands.cooldown(
-        rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.guild
-    )
     async def listsfx(self, ctx):
         """
         Prints all available sounds for this server.
@@ -378,9 +375,6 @@ class SFX(commands.Cog):
             await ctx.send("```None```")
 
     @commands.command(aliases=["setvoice"])
-    @commands.cooldown(
-        rate=1, per=15, type=discord.ext.commands.cooldowns.BucketType.user
-    )
     async def myvoice(self, ctx, voice: str = None):
         """
         Changes your TTS voice.
@@ -404,9 +398,6 @@ class SFX(commands.Cog):
             )
 
     @commands.command(aliases=["setspeed"])
-    @commands.cooldown(
-        rate=1, per=15, type=discord.ext.commands.cooldowns.BucketType.user
-    )
     async def myspeed(self, ctx, speed: int = None):
         """
         Changes your TTS speed.
@@ -431,9 +422,6 @@ class SFX(commands.Cog):
             )
 
     @commands.command()
-    @commands.cooldown(
-        rate=1, per=10, type=discord.ext.commands.cooldowns.BucketType.user
-    )
     async def listvoices(self, ctx, lang="en"):
         """
         Lists all the TTS voices.
