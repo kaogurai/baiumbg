@@ -1,6 +1,6 @@
 {
-    "author" : ["baiumbg"],
+    "author" : ["baiumbg", "alec#8068 (749112024633704481)"],
     "short" : "Allow users to play TTS audio.",
-    "requirements" : ["aiofiles", "red-lavalink", "aiohttp", "pydub"],
+    "requirements" : ["aiofiles", "pydub"],
     "tags" : ["tts", "audio"]
 }
