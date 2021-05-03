@@ -69,8 +69,12 @@ class SFX(commands.Cog):
         await TTSAPI.get_audio(
             self, decoded_string, author_voice, author_speed, audio_file
         )
+        
+        try:
+            audio_data = pydub.AudioSegment.from_file(audio_file)
+        except Exception:
+            await ctx.send("Uh oh, an error occured. The text u provided most likely isn't a valid message.")
 
-        audio_data = pydub.AudioSegment.from_file(audio_file)
         silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
