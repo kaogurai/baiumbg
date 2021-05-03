@@ -73,7 +73,7 @@ class SFX(commands.Cog):
         try:
             audio_data = pydub.AudioSegment.from_file(audio_file)
         except Exception:
-            await ctx.send("Uh oh, an error occured. The text u provided most likely isn't a valid message.")
+            await ctx.send("Uh oh, an error occured. The text you provided most likely isn't a valid message.")
             return
 
         silence = pydub.AudioSegment.silent(duration=750)
