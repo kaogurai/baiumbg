@@ -631,7 +631,7 @@ class SFX(commands.Cog):
         if (
             event == lavalink.LavalinkEvents.TRACK_END
             and self.last_track_info is not None
-            and player.current.track_identifier
+            and player.current and player.current.track_identifier
             == self.last_track_info[0].track_identifier
         ):
             print(str(self.last_track_info[0].uri))
