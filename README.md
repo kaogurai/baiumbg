@@ -1,4 +1,5 @@
-# sfx cog
+# baiumbg-Cogs
+A bunch of useless (and some questionably useful) cogs for [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot) (V3)
 
 this is a fork of [baiumbg](https://github.com/baiumbg/baiumbg-Cogs)'s SFX cog for Red-DiscordBot
 
