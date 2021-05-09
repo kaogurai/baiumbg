@@ -9,7 +9,7 @@ class Penis(commands.Cog):
     def __init__(self):
         pass
 
-    @commands.command()
+    @commands.command(aliases=["pp"])
     async def penis(self, ctx, *users: discord.Member):
         """
         Detects user's penis length
