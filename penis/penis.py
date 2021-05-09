@@ -11,10 +11,14 @@ class Penis(commands.Cog):
 
     @commands.command()
     async def penis(self, ctx, *users: discord.Member):
-        """Detects user's penis length
+        """
+        Detects user's penis length
 
         This is 100% accurate.
-        Enter multiple users for an accurate comparison!"""
+        Enter multiple users for an accurate comparison!
+        """
+        if not users:
+            users = (ctx.author,)
 
         dongs = {}
         msg = ""
