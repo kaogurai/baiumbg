@@ -227,7 +227,6 @@ class SFX(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    @commands.guild_only()
     async def addglobalsfx(self, ctx, name: str, link: str = None):
         """Adds a new sound globally.
 
@@ -327,7 +326,6 @@ class SFX(commands.Cog):
 
     @commands.command()
     @checks.is_owner()
-    @commands.guild_only()
     async def delglobalsfx(self, ctx, soundname: str):
         """
         Deletes an existing global sound.
