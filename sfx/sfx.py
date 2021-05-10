@@ -36,6 +36,7 @@ class SFX(commands.Cog):
     @commands.cooldown(
         rate=1, per=1, type=discord.ext.commands.cooldowns.BucketType.guild
     )
+    @commands.guild_only()
     async def tts(self, ctx, *, text):
         """
         Plays the given text as TTS in your current voice channel.
@@ -90,6 +91,7 @@ class SFX(commands.Cog):
     @commands.cooldown(
         rate=1, per=1, type=discord.ext.commands.cooldowns.BucketType.guild
     )
+    @commands.guild_only()
     async def sfx(self, ctx, sound: str):
         """
         Plays an existing sound in your current voice channel.
@@ -157,7 +159,8 @@ class SFX(commands.Cog):
         await self._play_sfx(ctx.author.voice.channel, filepath)
 
     @commands.command()
-    @checks.mod()
+    @commands.admin_or_permissions(manage_guild=True)
+    @commands.guild_only()
     async def addsfx(self, ctx, name: str, link: str = None):
         """Adds a new sound.
         Either upload the file as a Discord attachment and make your comment
@@ -224,6 +227,7 @@ class SFX(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    @commands.guild_only()
     async def addglobalsfx(self, ctx, name: str, link: str = None):
         """Adds a new sound globally.
 
@@ -291,7 +295,8 @@ class SFX(commands.Cog):
         await ctx.send(f"Sound **{name}** added.")
 
     @commands.command()
-    @checks.mod()
+    @commands.admin_or_permissions(manage_guild=True)
+    @commands.guild_only()
     async def delsfx(self, ctx, soundname: str):
         """
         Deletes an existing sound.
@@ -322,6 +327,7 @@ class SFX(commands.Cog):
 
     @commands.command()
     @checks.is_owner()
+    @commands.guild_only()
     async def delglobalsfx(self, ctx, soundname: str):
         """
         Deletes an existing global sound.
@@ -346,6 +352,7 @@ class SFX(commands.Cog):
         await ctx.send(f"Sound **{soundname}** deleted.")
 
     @commands.command()
+    @commands.guild_only()
     async def listsfx(self, ctx):
         """
         Prints all available sounds for this server.
@@ -442,7 +449,7 @@ class SFX(commands.Cog):
 
     @commands.group()
     @commands.guild_only()
-    @commands.admin()
+    @commands.admin_or_permissions(manage_guild=True)
     async def ttschannel(self, ctx):
         """
         Configures automatic TTS channels.
