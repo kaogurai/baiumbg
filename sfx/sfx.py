@@ -7,6 +7,7 @@ import random
 import lavalink
 import aiohttp
 import pydub
+import datetime
 
 
 class SFX(commands.Cog):
@@ -577,6 +578,8 @@ class SFX(commands.Cog):
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
+        if player.fetch("connect") is None:
+            player.store("connect", datetime.datetime.utcnow())
         tracks = await player.load_tracks(query=filepath)
         track = tracks.tracks[0]
 
