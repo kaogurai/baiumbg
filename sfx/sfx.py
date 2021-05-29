@@ -53,6 +53,7 @@ class SFX(commands.Cog):
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".mp3",
         )
         author_voice = await self.config.user(ctx.author).voice()
+        char_limit = TTSAPI.voices[author_voice]['limit']
         author_speed = await self.config.user(ctx.author).speed()
 
         encoded_string = text.encode("ascii", "ignore")
@@ -64,7 +65,7 @@ class SFX(commands.Cog):
 
         if len(decoded_string) > 1000:
             await ctx.send(
-                "Sorry, I only allow messages with 1000 characters or below to be spoken."
+                f"Sorry, this voice has a limit of **{str(char_limit)}** characters."
             )
             return
 
@@ -442,7 +443,7 @@ class SFX(commands.Cog):
             title="Available TTS Voices", color=await ctx.embed_colour()
         )
         for voice in voices:
-            value = voices[voice]["gender"] + " - " + voices[voice]["language"]
+            value = voices[voice]["gender"] + " - " + voices[voice]["language"] + " - " + "character limit: " + voices[voice]["limit"]
             embed.add_field(name=voice, value=value, inline=False)
         await ctx.send(embed=embed)
 
@@ -540,6 +541,7 @@ class SFX(commands.Cog):
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".wav",
         )
         author_voice = await self.config.user(message.author).voice()
+        char_limit = TTSAPI.voices[author_voice]['limit']
         author_speed = await self.config.user(message.author).speed()
 
         encoded_string = message.content.encode("ascii", "ignore")
@@ -549,9 +551,9 @@ class SFX(commands.Cog):
             await message.channel.send("That's not a valid message, sorry.")
             return
 
-        if len(decoded_string) > 1000:
+        if len(decoded_string) > char_limit:
             await message.channel.send(
-                "Sorry, I only allow messages with 1000 characters or below to be spoken."
+                f"Sorry, this voice has a limit of **{str(char_limit)}** characters."
             )
             return
 
