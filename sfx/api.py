@@ -6,7 +6,7 @@ import urllib.parse
 class TTSAPI:
 
     voices = {
-        "clara": {"language": "english", "gender": "female", "limit": 500},
+        "clara": {"language": "english", "gender": "female", "limit": 600},
         "matt": {"language": "english", "gender": "male", "limit": 500},
         "carmen": {"language": "spanish", "gender": "female", "limit": 500},
         "jose": {"language": "spanish", "gender": "male", "limit": 500},
