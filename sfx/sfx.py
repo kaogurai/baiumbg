@@ -443,7 +443,7 @@ class SFX(commands.Cog):
             title="Available TTS Voices", color=await ctx.embed_colour()
         )
         for voice in voices:
-            value = voices[voice]["gender"] + " - " + voices[voice]["language"] + " - " + "character limit: " + voices[voice]["limit"]
+            value = voices[voice]["gender"] + " - " + voices[voice]["language"] + " - " + "character limit: " + str(voices[voice]["limit"])
             embed.add_field(name=voice, value=value, inline=False)
         await ctx.send(embed=embed)
 
