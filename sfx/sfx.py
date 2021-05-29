@@ -53,7 +53,7 @@ class SFX(commands.Cog):
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".mp3",
         )
         author_voice = await self.config.user(ctx.author).voice()
-        char_limit = TTSAPI.voices[author_voice]['limit']
+        char_limit = TTSAPI.voices[author_voice]["limit"]
         author_speed = await self.config.user(ctx.author).speed()
 
         encoded_string = text.encode("ascii", "ignore")
@@ -76,7 +76,9 @@ class SFX(commands.Cog):
         try:
             audio_data = pydub.AudioSegment.from_file(audio_file)
         except Exception:
-            await ctx.send("Uh oh, an error occured. The text you provided most likely isn't a valid message.")
+            await ctx.send(
+                "Uh oh, an error occured. The text you provided most likely isn't a valid message."
+            )
             return
 
         silence = pydub.AudioSegment.silent(duration=750)
@@ -443,7 +445,14 @@ class SFX(commands.Cog):
             title="Available TTS Voices", color=await ctx.embed_colour()
         )
         for voice in voices:
-            value = voices[voice]["gender"] + " - " + voices[voice]["language"] + " - " + "character limit: " + str(voices[voice]["limit"])
+            value = (
+                voices[voice]["gender"]
+                + " - "
+                + voices[voice]["language"]
+                + " - "
+                + "character limit: "
+                + str(voices[voice]["limit"])
+            )
             embed.add_field(name=voice, value=value, inline=False)
         await ctx.send(embed=embed)
 
@@ -541,7 +550,7 @@ class SFX(commands.Cog):
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".wav",
         )
         author_voice = await self.config.user(message.author).voice()
-        char_limit = TTSAPI.voices[author_voice]['limit']
+        char_limit = TTSAPI.voices[author_voice]["limit"]
         author_speed = await self.config.user(message.author).speed()
 
         encoded_string = message.content.encode("ascii", "ignore")
@@ -641,7 +650,8 @@ class SFX(commands.Cog):
         if (
             event == lavalink.LavalinkEvents.TRACK_END
             and self.last_track_info is not None
-            and player.current and player.current.track_identifier
+            and player.current
+            and player.current.track_identifier
             == self.last_track_info[0].track_identifier
         ):
             print(str(self.last_track_info[0].uri))

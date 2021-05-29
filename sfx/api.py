@@ -13,9 +13,17 @@ class TTSAPI:
         "shinji": {"language": "japanese", "gender": "male", "limit": 200},
         "kyuri": {"language": "korean", "gender": "female", "limit": 250},
         "jinho": {"language": "korean", "gender": "male", "limit": 250},
-        "meimei": {"language": "chinese (simplified)", "gender": "female", "limit": 200},
+        "meimei": {
+            "language": "chinese (simplified)",
+            "gender": "female",
+            "limit": 200,
+        },
         "liangliang": {"language": "chinese", "gender": "male", "limit": 150},
-        "chiahua": {"language": "chinese (traditional)", "gender": "female", "limit": 150},
+        "chiahua": {
+            "language": "chinese (traditional)",
+            "gender": "female",
+            "limit": 150,
+        },
     }
 
     speeds = {0: 5, 1: 4, 2: 3, 3: 2, 4: 1, 5: 0, 6: -1, 7: -2, 8: -3, 9: -4, 10: -5}

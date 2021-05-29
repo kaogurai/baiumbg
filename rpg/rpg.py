@@ -15,66 +15,76 @@ import re
 from redbot.core import checks, commands, Config, bank
 from redbot.core.utils.chat_formatting import error, pagify, warning
 
-from .items import DEFAULT_BODY_ARMORS, DEFAULT_BOOTS, DEFAULT_GLOVES, \
-                  DEFAULT_HEALING_ITEMS, DEFAULT_HELMETS, DEFAULT_PANTS, \
-                  DEFAULT_SHOULDERS, DEFAULT_WEAPONS, ARMOR_PIECES, \
-                  ARMOR_PIECE_TO_BODY_PARTS, DEFAULT_EQUIPPED, DEFAULT_ITEMS
+from .items import (
+    DEFAULT_BODY_ARMORS,
+    DEFAULT_BOOTS,
+    DEFAULT_GLOVES,
+    DEFAULT_HEALING_ITEMS,
+    DEFAULT_HELMETS,
+    DEFAULT_PANTS,
+    DEFAULT_SHOULDERS,
+    DEFAULT_WEAPONS,
+    ARMOR_PIECES,
+    ARMOR_PIECE_TO_BODY_PARTS,
+    DEFAULT_EQUIPPED,
+    DEFAULT_ITEMS,
+)
 
-__version__ = '2.0.0'
+__version__ = "2.0.0"
 
 
 # Constants
-TARGET_SELF = 'self'
-TARGET_OTHER = 'target'
+TARGET_SELF = "self"
+TARGET_OTHER = "target"
 
 HR_STATS = {
-    'name': 'Item',
-    'damage': 'Damage',
-    'healing': 'Healing',
-    'armor': 'Armor',
-    'cost': 'Cost',
-    'crit_chance': 'Crit Chance',
-    'hit_chance': 'Hit Chance',
-    'low': 'Low',
-    'high': 'High',
-    'verb': 'Verb',
-    'preposition': 'Preposition',
-    'template': 'Template'
+    "name": "Item",
+    "damage": "Damage",
+    "healing": "Healing",
+    "armor": "Armor",
+    "cost": "Cost",
+    "crit_chance": "Crit Chance",
+    "hit_chance": "Hit Chance",
+    "low": "Low",
+    "high": "High",
+    "verb": "Verb",
+    "preposition": "Preposition",
+    "template": "Template",
 }
 
 MAX_ROWS_PER_CATEGORY = {
-    'weapon': 12,
-    'body_armor': 15,
-    'gloves': 15,
-    'boots': 15,
-    'shoulders': 15,
-    'pants': 15,
-    'helmet': 15,
-    'healing_item': 15
+    "weapon": 12,
+    "body_armor": 15,
+    "gloves": 15,
+    "boots": 15,
+    "shoulders": 15,
+    "pants": 15,
+    "helmet": 15,
+    "healing_item": 15,
 }
 
 MAX_ROWS_PER_CATEGORY_EX = {
-    'weapon': 8,
-    'body_armor': 15,
-    'gloves': 15,
-    'boots': 15,
-    'shoulders': 15,
-    'pants': 15,
-    'helmet': 15,
-    'healing_item': 5
+    "weapon": 8,
+    "body_armor": 15,
+    "gloves": 15,
+    "boots": 15,
+    "shoulders": 15,
+    "pants": 15,
+    "helmet": 15,
+    "healing_item": 5,
 }
 
 ITEM_FIELD_TYPES = {
-    'low': int,
-    'high': int,
-    'crit_chance': float,
-    'hit_chance': float,
-    'name': str,
-    'template': str,
-    'verb': str,
-    'preposition': str,
-    'cost': int,
-    'armor': int
+    "low": int,
+    "high": int,
+    "crit_chance": float,
+    "hit_chance": float,
+    "name": str,
+    "template": str,
+    "verb": str,
+    "preposition": str,
+    "cost": int,
+    "armor": int,
 }
 
 EXPERIENCE_PER_LEVEL = {
@@ -87,30 +97,39 @@ EXPERIENCE_PER_LEVEL = {
     7: 1150,
     8: 1400,
     9: 1700,
-    10: 2000
+    10: 2000,
 }
 
-EDIT_ITEM_REGEX = re.compile(r'^([^,]+),([^,]+),([^,]+)$')
+EDIT_ITEM_REGEX = re.compile(r"^([^,]+),([^,]+),([^,]+)$")
 ADD_SLOT_REGEXES = {
     # name,cost,low,high,crit_chance,hit_chance,verb,preposition
-    'weapon': re.compile(r'^([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$'),
+    "weapon": re.compile(
+        r"^([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$"
+    ),
     # name,cost,armor
-    'helmet': re.compile(r'^([^,]+),([^,]+),([^,]+)$'),
-    'gloves': re.compile(r'^([^,]+),([^,]+),([^,]+)$'),
-    'boots': re.compile(r'^([^,]+),([^,]+),([^,]+)$'),
-    'shoulders': re.compile(r'^([^,]+),([^,]+),([^,]+)$'),
-    'body_armor': re.compile(r'^([^,]+),([^,]+),([^,]+)$'),
+    "helmet": re.compile(r"^([^,]+),([^,]+),([^,]+)$"),
+    "gloves": re.compile(r"^([^,]+),([^,]+),([^,]+)$"),
+    "boots": re.compile(r"^([^,]+),([^,]+),([^,]+)$"),
+    "shoulders": re.compile(r"^([^,]+),([^,]+),([^,]+)$"),
+    "body_armor": re.compile(r"^([^,]+),([^,]+),([^,]+)$"),
     # name,cost,low,high,template
-    'healing_item': re.compile(r'^([^,]+),([^,]+),([^,]+),([^,]+),(.+)$')
+    "healing_item": re.compile(r"^([^,]+),([^,]+),([^,]+),([^,]+),(.+)$"),
 }
 
+
 def indicatize(w):
-    if w[-2:] == 'ch' or w[-2:] == 'sh' or w[-2:] == 'ss' or w[-1] == 'x' or w[-1] == 'z':
-        w += 'es'
-    elif w[-1] == 'y':
-        w = w[:-1] + 'ies'
+    if (
+        w[-2:] == "ch"
+        or w[-2:] == "sh"
+        or w[-2:] == "ss"
+        or w[-1] == "x"
+        or w[-1] == "z"
+    ):
+        w += "es"
+    elif w[-1] == "y":
+        w = w[:-1] + "ies"
     else:
-        w += 's'
+        w += "s"
 
     return w
 
@@ -121,16 +140,16 @@ class Player:
         self.member = member
         self.mention = member.mention
         self.cog = cog
-        self.weapon = items['weapon']
+        self.weapon = items["weapon"]
         self.armor = {
-            'helmet': items['helmet'],
-            'body_armor': items['body_armor'],
-            'pants': items['pants'],
-            'shoulders': items['shoulders'],
-            'gloves': items['gloves'],
-            'boots': items['boots']
+            "helmet": items["helmet"],
+            "body_armor": items["body_armor"],
+            "pants": items["pants"],
+            "shoulders": items["shoulders"],
+            "gloves": items["gloves"],
+            "boots": items["boots"],
         }
-        self.healing_item = items['healing_item']
+        self.healing_item = items["healing_item"]
 
     # Using object in string context gives (nick)name
     def __str__(self):
@@ -147,22 +166,22 @@ class Player:
         return stats[stat]
 
     async def get_wins(self):
-        return await self._get_stat('wins')
+        return await self._get_stat("wins")
 
     async def set_wins(self, num):
-        await self._set_stat('wins', num)
+        await self._set_stat("wins", num)
 
     async def get_losses(self):
-        return await self._get_stat('losses')
+        return await self._get_stat("losses")
 
     async def set_losses(self, num):
-        await self._set_stat('losses', num)
+        await self._set_stat("losses", num)
 
     async def get_draws(self):
-        return await self._get_stat('draws')
+        return await self._get_stat("draws")
 
     async def set_draws(self, num):
-        await self._set_stat('draws', num)
+        await self._set_stat("draws", num)
 
 
 # TEMPLATES BEGIN
@@ -178,13 +197,13 @@ BOT = "{a} charges its laser aaaaaaaand... BZZZZZZT! {d} is now a smoking crater
 
 EQUIPPED = "```http\nWeapon: {w}\nHelmet: {h}\nBody armor: {a}\nPants: {p}\nShoulders: {s}\nGloves: {g}\nBoots: {b}\nHealing item: {heal}```"
 
-HITS = ['deal', 'hit for']
-RECOVERS = ['recover', 'gain', 'heal']
+HITS = ["deal", "hit for"]
+RECOVERS = ["recover", "gain", "heal"]
 
 # TEMPLATES END
 
 # Weights of distribution for biased selection of moves
-WEIGHTED_MOVES = {'ATTACK': 1, 'HEAL': 0.1}
+WEIGHTED_MOVES = {"ATTACK": 1, "HEAL": 0.1}
 
 
 class RPG(commands.Cog):
@@ -192,28 +211,23 @@ class RPG(commands.Cog):
         self.underway = set()
         self.config = Config.get_conf(self, identifier=134621854878007299)
         default_member_config = {
-            'stats': {
-                'wins': 0,
-                'losses': 0,
-                'draws': 0
-            },
-            'equipped': DEFAULT_EQUIPPED,
-            'inventory': [],
-            'level': 1,
-            'experience': 0
+            "stats": {"wins": 0, "losses": 0, "draws": 0},
+            "equipped": DEFAULT_EQUIPPED,
+            "inventory": [],
+            "level": 1,
+            "experience": 0,
         }
         default_guild_config = {
-            'protected': [],
-            'self_protect': False,
-            'edit_posts': False,
-            'items': DEFAULT_ITEMS,
-            'initial_hp': 20,
-            'max_rounds': 10,
-            'currency_per_win': 10
+            "protected": [],
+            "self_protect": False,
+            "edit_posts": False,
+            "items": DEFAULT_ITEMS,
+            "initial_hp": 20,
+            "max_rounds": 10,
+            "currency_per_win": 10,
         }
         self.config.register_member(**default_member_config)
         self.config.register_guild(**default_guild_config)
-
 
     @commands.guild_only()
     @commands.group(name="protect", invoke_without_command=True)
@@ -227,7 +241,6 @@ class RPG(commands.Cog):
             return
 
         await ctx.send_help()
-
 
     @_protect.command(name="me")
     async def _protect_self(self, ctx):
@@ -243,7 +256,7 @@ class RPG(commands.Cog):
             await ctx.send("You're already in the protection list.")
             return
         elif self_protect is False:
-            await ctx.send('Sorry, self-protection is currently disabled.')
+            await ctx.send("Sorry, self-protection is currently disabled.")
             return
         elif type(self_protect) is int:
             if not await bank.can_spend(author, self_protect):
@@ -261,7 +274,6 @@ class RPG(commands.Cog):
         else:
             await ctx.send("Something went wrong adding you to the protection list.")
 
-
     @checks.mod_or_permissions(administrator=True)
     @_protect.command(name="user")
     async def _protect_user(self, ctx, user: discord.Member):
@@ -270,10 +282,12 @@ class RPG(commands.Cog):
         """
 
         if await self.protect_common(user, True):
-            await ctx.send("%s has been successfully added to the protection list." % user.display_name)
+            await ctx.send(
+                "%s has been successfully added to the protection list."
+                % user.display_name
+            )
         else:
             await ctx.send("%s is already in the protection list." % user.display_name)
-
 
     @checks.admin_or_permissions(administrator=True)
     @_protect.command(name="role")
@@ -283,10 +297,12 @@ class RPG(commands.Cog):
         """
 
         if await self.protect_common(role, True):
-            await ctx.send("The %s role has been successfully added to the protection list." % role.name)
+            await ctx.send(
+                "The %s role has been successfully added to the protection list."
+                % role.name
+            )
         else:
             await ctx.send("The %s role is already in the protection list." % role.name)
-
 
     @commands.guild_only()
     @commands.group(name="unprotect", invoke_without_command=True)
@@ -301,7 +317,6 @@ class RPG(commands.Cog):
 
         await ctx.send_help()
 
-
     @checks.mod_or_permissions(administrator=True)
     @_unprotect.command(name="user")
     async def _unprotect_user(self, ctx, user: discord.Member):
@@ -310,10 +325,12 @@ class RPG(commands.Cog):
         """
 
         if await self.protect_common(user, False):
-            await ctx.send("%s has been successfully removed from the protection list." % user.display_name)
+            await ctx.send(
+                "%s has been successfully removed from the protection list."
+                % user.display_name
+            )
         else:
             await ctx.send("%s is not in the protection list." % user.display_name)
-
 
     @checks.admin_or_permissions(administrator=True)
     @_unprotect.command(name="role")
@@ -323,10 +340,12 @@ class RPG(commands.Cog):
         """
 
         if await self.protect_common(role, False):
-            await ctx.send("The %s role has been successfully removed from the protection list." % role.name)
+            await ctx.send(
+                "The %s role has been successfully removed from the protection list."
+                % role.name
+            )
         else:
             await ctx.send("The %s role is not in the protection list." % role.name)
-
 
     @_unprotect.command(name="me")
     async def _unprotect_self(self, ctx):
@@ -339,9 +358,8 @@ class RPG(commands.Cog):
         else:
             await ctx.send("You aren't in the protection list.")
 
-
     @commands.guild_only()
-    @commands.command(name="protected", aliases=['protection'])
+    @commands.command(name="protected", aliases=["protection"])
     async def _protection(self, ctx):
         """
         Displays the duel protection list
@@ -355,13 +373,17 @@ class RPG(commands.Cog):
         if member_list:
             name_list = map(fmt, member_list)
             name_list = ["**Protected users and roles:**"] + sorted(name_list)
-            delim = '\n'
+            delim = "\n"
 
-            for page in pagify(delim.join(name_list), delims=[delim], escape_mass_mentions=True):
+            for page in pagify(
+                delim.join(name_list), delims=[delim], escape_mass_mentions=True
+            ):
                 await ctx.send(page)
         else:
-            await ctx.send("The list is currently empty, add users or roles with `%sprotect` first." % ctx.prefix)
-
+            await ctx.send(
+                "The list is currently empty, add users or roles with `%sprotect` first."
+                % ctx.prefix
+            )
 
     @commands.guild_only()
     @commands.group(name="duels", invoke_without_command=True)
@@ -372,7 +394,6 @@ class RPG(commands.Cog):
 
         if ctx.invoked_subcommand is None:
             await ctx.invoke(self._duels_list)
-
 
     @_duels.command(name="list")
     @commands.cooldown(2, 60, discord.ext.commands.BucketType.user)
@@ -389,15 +410,19 @@ class RPG(commands.Cog):
 
         def sort_wins(kv):
             _, v = kv
-            return v['stats']['wins'] - v['stats']['losses']
+            return v["stats"]["wins"] - v["stats"]["losses"]
 
         def stat_filter(kv):
             _, config = kv
 
-            if type(config['stats']) is not dict:
+            if type(config["stats"]) is not dict:
                 return False
 
-            if config['stats']['wins'] == 0 and config['stats']['losses'] == 0 and config['stats']['draws'] == 0:
+            if (
+                config["stats"]["wins"] == 0
+                and config["stats"]["losses"] == 0
+                and config["stats"]["draws"] == 0
+            ):
                 return False
 
             return True
@@ -407,7 +432,7 @@ class RPG(commands.Cog):
         duels_sorted = sorted(duel_stats, key=sort_wins, reverse=True)
 
         if not duels_sorted:
-            await ctx.send('No records to show.')
+            await ctx.send("No records to show.")
             return
 
         if len(duels_sorted) < top:
@@ -415,21 +440,32 @@ class RPG(commands.Cog):
 
         topten = duels_sorted[:top]
         place = 1
-        members = {uid: server.get_member(uid) for uid, _ in topten}  # only look up once each
+        members = {
+            uid: server.get_member(uid) for uid, _ in topten
+        }  # only look up once each
         names = {uid: m.display_name for uid, m in members.items()}
-        header = ['#', 'Name', 'wins', 'losses', 'draws']
+        header = ["#", "Name", "wins", "losses", "draws"]
         table_rows = []
-        msg = ''
+        msg = ""
         for uid, config in topten:
-            table_rows.append([place, names[uid], config['stats']['wins'], config['stats']['losses'], config['stats']['draws']])
+            table_rows.append(
+                [
+                    place,
+                    names[uid],
+                    config["stats"]["wins"],
+                    config["stats"]["losses"],
+                    config["stats"]["draws"],
+                ]
+            )
             place += 1
 
         msg = f'```py\n{tabulate.tabulate(table_rows, headers=header, tablefmt="fancy_grid")}```'
         if len(msg) < 1985:
             await ctx.send(msg)
         else:
-            await ctx.send("The leaderboard is too big to be displayed. Try with a lower <top> parameter.")
-
+            await ctx.send(
+                "The leaderboard is too big to be displayed. Try with a lower <top> parameter."
+            )
 
     @commands.guild_only()
     @commands.command(name="duel")
@@ -452,7 +488,9 @@ class RPG(commands.Cog):
         elif user == author:
             await ctx.send("You can't duel yourself, silly!")
         elif await self.is_protected(author):
-            await ctx.send("You can't duel anyone while you're on the protected users list.")
+            await ctx.send(
+                "You can't duel anyone while you're on the protected users list."
+            )
         elif await self.is_protected(user):
             await ctx.send("%s is on the protected users list." % user.display_name)
         else:
@@ -465,8 +503,8 @@ class RPG(commands.Cog):
 
         p1_items = await self.get_equipped_full(author, ctx.guild)
         p2_items = await self.get_equipped_full(user, ctx.guild)
-        p1 = Player(self, author, p1_items, guild_config['initial_hp'])
-        p2 = Player(self, user, p2_items, guild_config['initial_hp'])
+        p1 = Player(self, author, p1_items, guild_config["initial_hp"])
+        p2 = Player(self, user, p2_items, guild_config["initial_hp"])
         self.underway.add(channel.id)
 
         try:
@@ -474,8 +512,8 @@ class RPG(commands.Cog):
             random.shuffle(order)
             msg = ["%s challenges %s to a duel!" % (p1, p2)]
             msg.append("\nBy a coin toss, %s will go first." % order[0][0])
-            msg_object = await ctx.send('\n'.join(msg))
-            for i in range(guild_config['max_rounds']):
+            msg_object = await ctx.send("\n".join(msg))
+            for i in range(guild_config["max_rounds"]):
                 if p1.hp <= 0 or p2.hp <= 0:
                     break
                 for attacker, defender in order:
@@ -483,12 +521,16 @@ class RPG(commands.Cog):
                         break
 
                     if attacker.member == ctx.me:
-                        move_msg = self.generate_action(attacker, defender, guild_config['initial_hp'], 'BOT')
+                        move_msg = self.generate_action(
+                            attacker, defender, guild_config["initial_hp"], "BOT"
+                        )
                     else:
-                        move_msg = self.generate_action(attacker, defender, guild_config['initial_hp'])
+                        move_msg = self.generate_action(
+                            attacker, defender, guild_config["initial_hp"]
+                        )
 
-                    if guild_config['edit_posts']:
-                        new_msg = '\n'.join(msg + [move_msg])
+                    if guild_config["edit_posts"]:
+                        new_msg = "\n".join(msg + [move_msg])
                         if len(new_msg) < 2000:
                             await self._robust_edit(msg_object, content=new_msg)
                             msg = msg + [move_msg]
@@ -506,12 +548,14 @@ class RPG(commands.Cog):
                 loser_losses = await loser.get_losses()
                 await victor.set_wins(victor_wins + 1)
                 await loser.set_losses(loser_losses + 1)
-                await bank.deposit_credits(victor.member, guild_config['currency_per_win'])
+                await bank.deposit_credits(
+                    victor.member, guild_config["currency_per_win"]
+                )
                 msg = f"After {i + 1} rounds, {victor.mention} wins with {victor.hp} HP! They have been awarded with {guild_config['currency_per_win']} {currency}!"
-                msg += '\nStats: '
+                msg += "\nStats: "
 
-                for p, end in ((victor, '; '), (loser, '.')):
-                    msg += f'{p} has {await p.get_wins()} wins, {await p.get_losses()} losses, {await p.get_draws()} draws{end}'
+                for p, end in ((victor, "; "), (loser, ".")):
+                    msg += f"{p} has {await p.get_wins()} wins, {await p.get_losses()} losses, {await p.get_draws()} draws{end}"
             else:
                 victor = None
 
@@ -519,14 +563,13 @@ class RPG(commands.Cog):
                     player_draws = await p.get_draws()
                     await p.set_draws(player_draws + 1)
 
-                msg = 'After %d rounds, the duel ends in a tie!' % (i + 1)
+                msg = "After %d rounds, the duel ends in a tie!" % (i + 1)
 
             await ctx.send(msg)
         except Exception:
             raise
         finally:
             self.underway.remove(channel.id)
-
 
     @commands.guild_only()
     @commands.group(name="shop", invoke_without_command=True)
@@ -541,7 +584,6 @@ class RPG(commands.Cog):
 
         await ctx.send_help()
 
-
     @_shop.command(name="list")
     async def _shop_list(self, ctx, category: str = None):
         """
@@ -551,14 +593,14 @@ class RPG(commands.Cog):
         items = await self.config.guild(ctx.guild).items()
 
         def sort_cost(item):
-            return item['cost']
+            return item["cost"]
 
         if category != None:
             if category not in items.keys():
                 await ctx.send(f"Valid item categories: {', '.join(items.keys())}")
                 return
 
-            final_msg = ''
+            final_msg = ""
             items = self.to_shop_items(items[category], category)
             table_rows = []
             for item in sorted(items, key=sort_cost):
@@ -570,12 +612,12 @@ class RPG(commands.Cog):
             if len(table_rows) != 0:
                 final_msg += f'```py\n{tabulate.tabulate(table_rows, headers = self.generate_header(category), tablefmt="fancy_grid")}```'
 
-            for page in pagify(final_msg, delims=['```py'], page_length=1992):
+            for page in pagify(final_msg, delims=["```py"], page_length=1992):
                 await ctx.send(page)
 
             return
 
-        final_msg = ''
+        final_msg = ""
         for category in items.keys():
             items[category] = self.to_shop_items(items[category], category)
             table_rows = []
@@ -588,9 +630,8 @@ class RPG(commands.Cog):
             if len(table_rows) != 0:
                 final_msg += f'```py\n{tabulate.tabulate(table_rows, headers = self.generate_header(category), tablefmt="fancy_grid")}```'
 
-        for page in pagify(final_msg, delims=['```py'], page_length=1992):
+        for page in pagify(final_msg, delims=["```py"], page_length=1992):
             await ctx.send(page)
-
 
     @_shop.command(name="buy")
     async def _shop_buy(self, ctx, *, item_name):
@@ -601,24 +642,32 @@ class RPG(commands.Cog):
         currency = await bank.get_currency_name(ctx.guild)
         inventory = await self.config.member(ctx.author).inventory()
 
-        if await self.item_equipped_by_member(ctx.author, item_name) or await self.item_in_member_inventory(ctx.author, item_name) or item_name in DEFAULT_EQUIPPED.values():
-            await ctx.send('You already have that item in your inventory!')
+        if (
+            await self.item_equipped_by_member(ctx.author, item_name)
+            or await self.item_in_member_inventory(ctx.author, item_name)
+            or item_name in DEFAULT_EQUIPPED.values()
+        ):
+            await ctx.send("You already have that item in your inventory!")
             return
 
         _, item = await self.get_item(ctx.guild, item_name)
         if item == None:
-            await ctx.send(f'Item **{item_name}** not found in shop!')
+            await ctx.send(f"Item **{item_name}** not found in shop!")
             return
 
         try:
-            await bank.withdraw_credits(ctx.author, item['cost'])
+            await bank.withdraw_credits(ctx.author, item["cost"])
         except ValueError:
-            await ctx.send(f'You do not have enough {currency} to buy a **{item_name}**!')
+            await ctx.send(
+                f"You do not have enough {currency} to buy a **{item_name}**!"
+            )
             return
 
         inventory.append(item_name)
         await self.config.member(ctx.author).inventory.set(sorted(inventory))
-        await ctx.send(f'You successfully bought a **{item_name}**! Equip it using `{ctx.prefix}inventory equip {item_name}`.')
+        await ctx.send(
+            f"You successfully bought a **{item_name}**! Equip it using `{ctx.prefix}inventory equip {item_name}`."
+        )
 
     @_shop.command(name="sell")
     async def _shop_sell(self, ctx, *, item_name):
@@ -636,7 +685,7 @@ class RPG(commands.Cog):
             return
 
         if item_name == DEFAULT_EQUIPPED[slot]:
-            await ctx.send('That item cannot be sold!')
+            await ctx.send("That item cannot be sold!")
             return
 
         if item_name not in inventory and equipped[slot] != item_name:
@@ -650,13 +699,12 @@ class RPG(commands.Cog):
             inventory.remove(item_name)
             await self.config.member(ctx.author).inventory.set(inventory)
 
-        resell_value = int(item['cost'] / 2)
+        resell_value = int(item["cost"] / 2)
         await bank.deposit_credits(ctx.author, resell_value)
-        await ctx.send(f'**{item_name}** sold for {resell_value} {currency}!')
-
+        await ctx.send(f"**{item_name}** sold for {resell_value} {currency}!")
 
     @commands.guild_only()
-    @commands.group(name="inventory", aliases=['inv'], invoke_without_command=True)
+    @commands.group(name="inventory", aliases=["inv"], invoke_without_command=True)
     async def _inventory(self, ctx):
         """
         Inventory management
@@ -664,7 +712,6 @@ class RPG(commands.Cog):
 
         if ctx.invoked_subcommand is None:
             await ctx.invoke(self._inventory_list)
-
 
     @_inventory.command(name="list")
     async def _inventory_list(self, ctx):
@@ -674,11 +721,10 @@ class RPG(commands.Cog):
 
         inventory = await self.get_inventory(ctx.author)
         equipped = await self.get_equipped_slots(ctx.author)
-        inventory_str = 'None' if not len(inventory) else ', '.join(inventory)
+        inventory_str = "None" if not len(inventory) else ", ".join(inventory)
         msg = f"{ctx.author.display_name}'s equipped items:\n{EQUIPPED.format(w = equipped['weapon'], h = equipped['helmet'], a = equipped['body_armor'], p = equipped['pants'], g = equipped['gloves'], b = equipped['boots'], s = equipped['shoulders'], heal = equipped['healing_item'])}"
         msg += f"{ctx.author.display_name}'s inventory:\n```{inventory_str}```"
         await ctx.send(msg)
-
 
     @_inventory.command(name="equip")
     async def _inventory_equip(self, ctx, *, item_name):
@@ -695,7 +741,7 @@ class RPG(commands.Cog):
             return
 
         if item_name == equipped[slot]:
-            await ctx.send('That item is already equipped!')
+            await ctx.send("That item is already equipped!")
             return
 
         if item_name not in inventory and item_name not in DEFAULT_EQUIPPED.values():
@@ -713,7 +759,6 @@ class RPG(commands.Cog):
         await self.config.member(ctx.author).inventory.set(inventory)
         await ctx.send(f"**{item_name}** equipped!")
 
-
     @_inventory.command(name="unequip")
     async def _inventory_unequip(self, ctx, slot):
         """
@@ -721,7 +766,9 @@ class RPG(commands.Cog):
         """
 
         if slot not in DEFAULT_EQUIPPED.keys():
-            await ctx.send(f"Invalid slot name! Valid slot names:\n```{', '.join(DEFAULT_EQUIPPED.keys())}```")
+            await ctx.send(
+                f"Invalid slot name! Valid slot names:\n```{', '.join(DEFAULT_EQUIPPED.keys())}```"
+            )
             return
 
         inventory = await self.get_inventory(ctx.author)
@@ -729,7 +776,9 @@ class RPG(commands.Cog):
         item_name = equipped[slot]
 
         if equipped[slot] == DEFAULT_EQUIPPED[slot]:
-            await ctx.send('Your currently equipped item in that slot cannot be unequipped!')
+            await ctx.send(
+                "Your currently equipped item in that slot cannot be unequipped!"
+            )
             return
 
         inventory.append(equipped[slot])
@@ -737,7 +786,6 @@ class RPG(commands.Cog):
         await self.config.member(ctx.author).equipped.set(equipped)
         await self.config.member(ctx.author).inventory.set(inventory)
         await ctx.send(f"**{item_name}** unequipped!")
-
 
     @commands.guild_only()
     @checks.admin_or_permissions(administrator=True)
@@ -749,16 +797,15 @@ class RPG(commands.Cog):
 
         if ctx.invoked_subcommand == None:
             guild_config = await self.config.guild(ctx.guild).all()
-            del guild_config['items']
-            del guild_config['protected']
-            msg = ''
+            del guild_config["items"]
+            del guild_config["protected"]
+            msg = ""
             for k, v in guild_config.items():
                 msg += f"{k}: {v}\n"
 
             for page in pagify(msg, page_length=1988):
                 await ctx.send(f"```http\n{page}```")
             return
-
 
     @_rpgset.command(name="initial_hp")
     async def _rpgset_initial_hp(self, ctx, initial_hp: int = None):
@@ -771,10 +818,9 @@ class RPG(commands.Cog):
             await ctx.send(f"```http\ninitial_hp: {guild_config['initial_hp']}```")
             return
 
-        guild_config['initial_hp'] = initial_hp
+        guild_config["initial_hp"] = initial_hp
         await self.config.guild(ctx.guild).set(guild_config)
         await ctx.send(f"`initial_hp` set to `{initial_hp}`")
-
 
     @_rpgset.command(name="max_rounds")
     async def _rpgset_max_rounds(self, ctx, max_rounds: int = None):
@@ -787,10 +833,9 @@ class RPG(commands.Cog):
             await ctx.send(f"```http\nmax_rounds: {guild_config['max_rounds']}```")
             return
 
-        guild_config['max_rounds'] = max_rounds
+        guild_config["max_rounds"] = max_rounds
         await self.config.guild(ctx.guild).set(guild_config)
         await ctx.send(f"`max_rounds` set to `{max_rounds}`")
-
 
     @_rpgset.command(name="edit_posts")
     async def _rpgset_edit_posts(self, ctx, edit_posts: bool = None):
@@ -803,10 +848,9 @@ class RPG(commands.Cog):
             await ctx.send(f"```http\nedit_posts: {guild_config['edit_posts']}```")
             return
 
-        guild_config['edit_posts'] = edit_posts
+        guild_config["edit_posts"] = edit_posts
         await self.config.guild(ctx.guild).set(guild_config)
         await ctx.send(f"`edit_posts` set to `{edit_posts}`")
-
 
     @_rpgset.command(name="self_protect")
     async def _rpgset_self_protect(self, ctx, self_protect: str = None):
@@ -824,9 +868,9 @@ class RPG(commands.Cog):
 
         self_protect = self_protect.lower().strip(' "`')
 
-        if self_protect in ('disable', 'no', 'n', 'false', 'f', 'off'):
+        if self_protect in ("disable", "no", "n", "false", "f", "off"):
             self_protect = False
-        elif self_protect in ('free', '0'):
+        elif self_protect in ("free", "0"):
             self_protect = True
         elif self_protect.isdecimal():
             self_protect = int(self_protect)
@@ -834,10 +878,9 @@ class RPG(commands.Cog):
             await ctx.send_help()
             return
 
-        guild_config['self_protect'] = self_protect
+        guild_config["self_protect"] = self_protect
         await self.config.guild(ctx.guild).set(guild_config)
         await ctx.send(f"`self_protect` set to `{self_protect}`")
-
 
     @_rpgset.command(name="currency_per_win")
     async def _rpgset_currency_per_win(self, ctx, currency_per_win: int = None):
@@ -847,13 +890,14 @@ class RPG(commands.Cog):
 
         guild_config = await self.config.guild(ctx.guild).all()
         if currency_per_win == None:
-            await ctx.send(f"```http\ncurrency_per_win: {guild_config['currency_per_win']}```")
+            await ctx.send(
+                f"```http\ncurrency_per_win: {guild_config['currency_per_win']}```"
+            )
             return
 
-        guild_config['currency_per_win'] = currency_per_win
+        guild_config["currency_per_win"] = currency_per_win
         await self.config.guild(ctx.guild).set(guild_config)
         await ctx.send(f"`currency_per_win` set to `{currency_per_win}`")
-
 
     @_rpgset.command(name="reset_players")
     async def _rpgset_reset_players(self, ctx):
@@ -862,8 +906,7 @@ class RPG(commands.Cog):
         """
 
         await self.config.clear_all_members(ctx.guild)
-        await ctx.send('Players reset.')
-
+        await ctx.send("Players reset.")
 
     @commands.guild_only()
     @checks.admin_or_permissions(administrator=True)
@@ -893,7 +936,7 @@ class RPG(commands.Cog):
                 await ctx.send(f"Valid item categories: {', '.join(items.keys())}")
                 return
 
-            final_msg = ''
+            final_msg = ""
             table_rows = []
             for item in items[category]:
                 table_rows.append(item.values())
@@ -904,12 +947,12 @@ class RPG(commands.Cog):
             if len(table_rows) != 0:
                 final_msg += f'```py\n{tabulate.tabulate(table_rows, headers = items[category][0].keys(), tablefmt="fancy_grid")}```'
 
-            for page in pagify(final_msg, delims=['```py'], page_length=1992):
+            for page in pagify(final_msg, delims=["```py"], page_length=1992):
                 await ctx.send(page)
 
             return
 
-        final_msg = ''
+        final_msg = ""
         for category in items.keys():
             table_rows = []
             for item in items[category]:
@@ -921,11 +964,10 @@ class RPG(commands.Cog):
             if len(table_rows) != 0:
                 final_msg += f'```py\n{tabulate.tabulate(table_rows, headers = items[category][0].keys(), tablefmt="fancy_grid")}```'
 
-        for page in pagify(final_msg, delims=['```py'], page_length=1992):
+        for page in pagify(final_msg, delims=["```py"], page_length=1992):
             await ctx.send(page)
 
         return
-
 
     @_items.command(name="add")
     async def _items_add(self, ctx, slot: str, *, item):
@@ -951,12 +993,16 @@ class RPG(commands.Cog):
         """
 
         if slot not in DEFAULT_ITEMS.keys():
-            await ctx.send(f"Invalid slot name! Valid slot names: {', '.join(DEFAULT_ITEMS.keys())}")
+            await ctx.send(
+                f"Invalid slot name! Valid slot names: {', '.join(DEFAULT_ITEMS.keys())}"
+            )
             return
 
         match = re.match(ADD_SLOT_REGEXES[slot], item)
         if not match:
-            await ctx.send(f"Invalid item format! Type `{ctx.prefix}help items add` for more information on the format of this command.")
+            await ctx.send(
+                f"Invalid item format! Type `{ctx.prefix}help items add` for more information on the format of this command."
+            )
             return
 
         items = await self.config.guild(ctx.guild).items()
@@ -974,11 +1020,15 @@ class RPG(commands.Cog):
         _, item = await self.get_item(ctx.guild, item_name)
 
         if item != None:
-            await ctx.send(f'Item **{item_name}** already exists! Use `{ctx.prefix}items edit` if you want to modify it.')
+            await ctx.send(
+                f"Item **{item_name}** already exists! Use `{ctx.prefix}items edit` if you want to modify it."
+            )
             return
 
-        if slot == 'weapon':
-            low, high, crit_chance, hit_chance, verb, preposition = match.group(3, 4, 5, 6, 7, 8)
+        if slot == "weapon":
+            low, high, crit_chance, hit_chance, verb, preposition = match.group(
+                3, 4, 5, 6, 7, 8
+            )
 
             try:
                 low = int(low)
@@ -1023,17 +1073,17 @@ class RPG(commands.Cog):
                 low, high = high, low
 
             item = {
-                'name': item_name,
-                'cost': cost,
-                'low': low,
-                'high': high,
-                'crit_chance': crit_chance,
-                'hit_chance': hit_chance,
-                'verb': verb,
-                'preposition': preposition
+                "name": item_name,
+                "cost": cost,
+                "low": low,
+                "high": high,
+                "crit_chance": crit_chance,
+                "hit_chance": hit_chance,
+                "verb": verb,
+                "preposition": preposition,
             }
 
-        elif slot == 'healing_item':
+        elif slot == "healing_item":
             low, high, template = match.group(3, 4, 5)
 
             if low > high:
@@ -1058,11 +1108,11 @@ class RPG(commands.Cog):
                 high = 0
 
             item = {
-                'name': item_name,
-                'cost': cost,
-                'low': low,
-                'high': high,
-                'template': template
+                "name": item_name,
+                "cost": cost,
+                "low": low,
+                "high": high,
+                "template": template,
             }
 
         else:
@@ -1077,11 +1127,7 @@ class RPG(commands.Cog):
             if armor < 0:
                 armor = 0
 
-            item = {
-                'name': item_name,
-                'cost': cost,
-                'armor': armor
-            }
+            item = {"name": item_name, "cost": cost, "armor": armor}
 
         items[slot].append(item)
         await self.config.guild(ctx.guild).items.set(items)
@@ -1124,31 +1170,36 @@ class RPG(commands.Cog):
 
         match = re.match(EDIT_ITEM_REGEX, edit)
         if not match:
-            await ctx.send(f"Invalid edit format! Type `{ctx.prefix}items edit` for more information on the format of this command.")
+            await ctx.send(
+                f"Invalid edit format! Type `{ctx.prefix}items edit` for more information on the format of this command."
+            )
 
         item_name, field, value = match.group(1, 2, 3)
 
         if item_name in DEFAULT_EQUIPPED.values():
-            await ctx.send(f'Item `{item_name}` cannot be editted!')
+            await ctx.send(f"Item `{item_name}` cannot be editted!")
             return
 
         _, item = await self.get_item(ctx.guild, item_name)
         if item == None:
-            await ctx.send(f'Item `{item_name}` does not exist!')
+            await ctx.send(f"Item `{item_name}` does not exist!")
             return
 
         try:
             value = ITEM_FIELD_TYPES[field](value)
         except ValueError:
-            await ctx.send(f"Invalid value format! Type `{ctx.prefix}help items edit` for more information on item field formats.")
+            await ctx.send(
+                f"Invalid value format! Type `{ctx.prefix}help items edit` for more information on item field formats."
+            )
             return
         except KeyError:
-            await ctx.send(f"Invalid field name! Check `{ctx.prefix}help items edit` for more information on item field names.")
+            await ctx.send(
+                f"Invalid field name! Check `{ctx.prefix}help items edit` for more information on item field names."
+            )
             return
 
         await self.edit_item(ctx.guild, item_name, field, value)
         await ctx.send(f"`{field}` of `{item_name}` set to `{value}`.")
-
 
     @_items.command(name="delete")
     async def _items_delete(self, ctx, *, item_name):
@@ -1158,18 +1209,18 @@ class RPG(commands.Cog):
 
         _, item = await self.get_item(ctx.guild, item_name)
         if item == None:
-            await ctx.send(f'Item `{item_name}` does not exist!')
+            await ctx.send(f"Item `{item_name}` does not exist!")
             return
 
-        if item['name'] in DEFAULT_EQUIPPED.values():
-            await ctx.send(f'Item `{item_name}` cannot be deleted!')
+        if item["name"] in DEFAULT_EQUIPPED.values():
+            await ctx.send(f"Item `{item_name}` cannot be deleted!")
             return
 
         for member in ctx.guild.members:
             await self.refund_item(member, item)
 
         await self.delete_item(ctx.guild, item_name)
-        await ctx.send(f'Item `{item_name}` deleted!')
+        await ctx.send(f"Item `{item_name}` deleted!")
 
     @_items.command(name="reset")
     async def _items_reset(self, ctx):
@@ -1178,8 +1229,7 @@ class RPG(commands.Cog):
         """
 
         await self.config.guild(ctx.guild).items.set(DEFAULT_ITEMS)
-        await ctx.send('Items reset to default!')
-
+        await ctx.send("Items reset to default!")
 
     @commands.guild_only()
     @checks.admin_or_permissions(administrator=True)
@@ -1193,7 +1243,6 @@ class RPG(commands.Cog):
         await ctx.send(f"Adding {amount} experience to {member.display_name}!")
         await self.add_experience(member, amount, ctx.channel)
 
-
     @commands.guild_only()
     @commands.command(name="level")
     async def _level(self, ctx, member: discord.Member = None):
@@ -1203,40 +1252,39 @@ class RPG(commands.Cog):
 
         member = ctx.author if member == None else member
         level, experience = await self.get_member_level(member)
-        await ctx.send(f"{member.display_name}'s current level and experience:\n```http\nLevel: {level}\nExperience: {experience}\nExperience to next level: {EXPERIENCE_PER_LEVEL[level] - experience}```")
+        await ctx.send(
+            f"{member.display_name}'s current level and experience:\n```http\nLevel: {level}\nExperience: {experience}\nExperience to next level: {EXPERIENCE_PER_LEVEL[level] - experience}```"
+        )
 
-
-# UTILS BEGIN
+    # UTILS BEGIN
 
     def format_display(self, server, id):
-        if id.startswith('r'):
+        if id.startswith("r"):
             role = discord.utils.get(server.roles, id=int(id[1:]))
 
             if role:
-                return '@%s' % role.name
+                return "@%s" % role.name
             else:
-                return 'deleted role #%s' % id
+                return "deleted role #%s" % id
         else:
             member = server.get_member(int(id))
 
             if member:
                 return member.display_name
             else:
-                return 'missing member #%s' % id
-
+                return "missing member #%s" % id
 
     async def is_protected(self, member: discord.Member, member_only=False) -> bool:
         protected = set(await self.config.guild(member.guild).protected())
-        roles = set() if member_only else set('r' + str(r.id) for r in member.roles)
+        roles = set() if member_only else set("r" + str(r.id) for r in member.roles)
         return str(member.id) in protected or bool(protected & roles)
-
 
     async def protect_common(self, obj, protect=True):
         if not isinstance(obj, (discord.Member, discord.Role)):
-            raise TypeError('Can only pass member or role objects.')
+            raise TypeError("Can only pass member or role objects.")
 
         server = obj.guild
-        id = ('r' if type(obj) is discord.Role else '') + str(obj.id)
+        id = ("r" if type(obj) is discord.Role else "") + str(obj.id)
 
         protected = await self.config.guild(server).protected()
 
@@ -1250,29 +1298,23 @@ class RPG(commands.Cog):
         await self.config.guild(server).protected.set(protected)
         return True
 
-
     async def _set_stats(self, user, stats):
         await self.config.member(user.member).stats.set(stats)
 
-
     async def _get_stats(self, user):
         return await self.config.member(user.member).stats()
-
 
     async def get_inventory(self, member):
         inventory = await self.config.member(member).inventory()
         return inventory
 
-
     async def get_equipped(self, member):
         equipped = await self.config.member(member).equipped()
         return [i for i in equipped.values()]
 
-
     async def get_equipped_slots(self, member):
         equipped = await self.config.member(member).equipped()
         return equipped
-
 
     async def get_equipped_full(self, member, guild):
         equipped = await self.config.member(member).equipped()
@@ -1282,28 +1324,25 @@ class RPG(commands.Cog):
             result[slot] = item
         return result
 
-
     async def get_item(self, guild, item_name):
         items = await self.config.guild(guild).items()
         for slot, category_items in items.items():
             for item in category_items:
-                if item['name'] == item_name:
+                if item["name"] == item_name:
                     return slot, item
 
         return None, None
 
-
-    async def get_item_ex(self, guild, item_name, slot = None):
+    async def get_item_ex(self, guild, item_name, slot=None):
         if slot == None:
             return self.get_item(guild, item_name)
 
         items = await self.config.guild(guild).items()
         for item in items[slot]:
-            if item['name'] == item_name:
+            if item["name"] == item_name:
                 return slot, item
 
         return None, None
-
 
     async def edit_item(self, guild, item_name, field, value):
         items = await self.config.guild(guild).items()
@@ -1311,7 +1350,7 @@ class RPG(commands.Cog):
         editted = False
         for slot, category_items in items.items():
             for item in category_items:
-                if item['name'] == item_name:
+                if item["name"] == item_name:
                     item[field] = value
                     editted = True
                     break
@@ -1321,13 +1360,13 @@ class RPG(commands.Cog):
         if editted:
             await self.config.guild(guild).items.set(items)
 
-        if field != 'name':
+        if field != "name":
             return
 
         for user_id, config in configs.items():
             equipped = {}
             update = False
-            for slot, slot_item in config['equipped'].items():
+            for slot, slot_item in config["equipped"].items():
                 if slot_item == item_name:
                     slot_item = value
                     update = True
@@ -1339,7 +1378,7 @@ class RPG(commands.Cog):
 
             inventory = []
             update = False
-            for inventory_item in config['inventory']:
+            for inventory_item in config["inventory"]:
                 if inventory_item == item_name:
                     inventory_item = value
                     update = True
@@ -1349,33 +1388,30 @@ class RPG(commands.Cog):
                 member = guild.get_member(user_id)
                 await self.config.member(member).inventory.set(inventory)
 
-
     async def delete_item(self, guild, item_name):
         items = await self.config.guild(guild).items()
         result = dict.fromkeys(items, [])
         for slot, slot_items in items.items():
-            result[slot] = [i for i in slot_items if i['name'] != item_name]
+            result[slot] = [i for i in slot_items if i["name"] != item_name]
 
         await self.config.guild(guild).items.set(result)
-
 
     async def refund_item(self, member, item):
         member_config = await self.config.member(member).all()
         count = 0
-        for slot, item_name in member_config['equipped'].items():
-            if item_name == item['name']:
-                member_config['equipped'][slot] = DEFAULT_EQUIPPED[slot]
+        for slot, item_name in member_config["equipped"].items():
+            if item_name == item["name"]:
+                member_config["equipped"][slot] = DEFAULT_EQUIPPED[slot]
                 count += 1
                 break
 
-        while item['name'] in member_config['inventory']:
-            member_config['inventory'].remove(item['name'])
+        while item["name"] in member_config["inventory"]:
+            member_config["inventory"].remove(item["name"])
             count += 1
 
         if count > 0:
             await self.config.member(member).set(member_config)
-            await bank.deposit_credits(member, item['cost'] * count)
-
+            await bank.deposit_credits(member, item["cost"] * count)
 
     async def item_in_member_inventory(self, member, item_name):
         inventory = await self.get_inventory(member)
@@ -1385,32 +1421,35 @@ class RPG(commands.Cog):
 
         return False
 
-
     async def item_equipped_by_member(self, member, item_name):
         equipped = await self.get_equipped(member)
         return item_name in equipped
 
-
     async def add_experience(self, member, experience, channel):
         member_config = await self.config.member(member).all()
-        new_experience = member_config['experience'] + experience
+        new_experience = member_config["experience"] + experience
         max_level = max(EXPERIENCE_PER_LEVEL.keys())
-        while new_experience >= EXPERIENCE_PER_LEVEL[member_config['level']] and member_config['level'] < max_level:
-            new_experience -= EXPERIENCE_PER_LEVEL[member_config['level']]
-            member_config['level'] += 1
-            await channel.send(f"{member.mention} has leveled up to {member_config['level']}!")
+        while (
+            new_experience >= EXPERIENCE_PER_LEVEL[member_config["level"]]
+            and member_config["level"] < max_level
+        ):
+            new_experience -= EXPERIENCE_PER_LEVEL[member_config["level"]]
+            member_config["level"] += 1
+            await channel.send(
+                f"{member.mention} has leveled up to {member_config['level']}!"
+            )
 
-        member_config['experience'] = new_experience
-        member_config['experience'] = min(member_config['experience'], EXPERIENCE_PER_LEVEL[max_level])
-        member_config['experience'] = max(member_config['experience'], 0)
+        member_config["experience"] = new_experience
+        member_config["experience"] = min(
+            member_config["experience"], EXPERIENCE_PER_LEVEL[max_level]
+        )
+        member_config["experience"] = max(member_config["experience"], 0)
 
         await self.config.member(member).set(member_config)
 
-
     async def get_member_level(self, member):
         member_config = await self.config.member(member).all()
-        return member_config['level'], member_config['experience']
-
+        return member_config["level"], member_config["experience"]
 
     def generate_action(self, attacker, defender, initial_hp, move_cat=None):
         # Select move category
@@ -1419,48 +1458,61 @@ class RPG(commands.Cog):
 
         armor_slot = random.choice(ARMOR_PIECES)
         bodypart = random.choice(ARMOR_PIECE_TO_BODY_PARTS[armor_slot])
-        armor_piece_name = defender.armor[armor_slot]['name']
-        verb = indicatize(attacker.weapon['verb'])
-        preposition = ''
-        obj = attacker.weapon['name']
+        armor_piece_name = defender.armor[armor_slot]["name"]
+        verb = indicatize(attacker.weapon["verb"])
+        preposition = ""
+        obj = attacker.weapon["name"]
         target = defender
-        if move_cat == 'ATTACK':
+        if move_cat == "ATTACK":
             move = ATTACK
-            hp_delta = min(0, -random.randint(attacker.weapon['low'], attacker.weapon['high']) + defender.armor[armor_slot]['armor'])
-            preposition = attacker.weapon['preposition']
+            hp_delta = min(
+                0,
+                -random.randint(attacker.weapon["low"], attacker.weapon["high"])
+                + defender.armor[armor_slot]["armor"],
+            )
+            preposition = attacker.weapon["preposition"]
             if hp_delta == 0:
                 move = ATTACK_PROTECTED
-                verb = attacker.weapon['verb']
-            elif attacker.weapon['hit_chance'] < random.random():
+                verb = attacker.weapon["verb"]
+            elif attacker.weapon["hit_chance"] < random.random():
                 move = MISS
-                verb = attacker.weapon['verb']
+                verb = attacker.weapon["verb"]
                 hp_delta = 0
-            elif attacker.weapon['crit_chance'] >= random.random():
+            elif attacker.weapon["crit_chance"] >= random.random():
                 move = CRITICAL_ATTACK
-                hp_delta = hp_delta * 2 - defender.armor[armor_slot]['armor']
-        elif move_cat == 'HEAL':
-            move = attacker.healing_item['template']
+                hp_delta = hp_delta * 2 - defender.armor[armor_slot]["armor"]
+        elif move_cat == "HEAL":
+            move = attacker.healing_item["template"]
             target = attacker
-            hp_delta = random.randint(attacker.healing_item['low'], attacker.healing_item['high'])
-            obj = attacker.healing_item['name']
+            hp_delta = random.randint(
+                attacker.healing_item["low"], attacker.healing_item["high"]
+            )
+            obj = attacker.healing_item["name"]
         else:
             move = BOT
             hp_delta = -initial_hp * 64
 
-        msg = move.format(a=attacker, d=defender, o=obj, v=verb, b=bodypart, p=preposition, ap=armor_piece_name)
+        msg = move.format(
+            a=attacker,
+            d=defender,
+            o=obj,
+            v=verb,
+            b=bodypart,
+            p=preposition,
+            ap=armor_piece_name,
+        )
         if hp_delta == 0:
             pass
         else:
             target.hp += hp_delta
             if hp_delta > 0:
                 s = random.choice(RECOVERS)
-                msg += ' They %s %d HP (%d)' % (s, abs(hp_delta), target.hp)
+                msg += " They %s %d HP (%d)" % (s, abs(hp_delta), target.hp)
             elif hp_delta < 0:
                 s = random.choice(HITS)
-                msg += ' They %s %d damage (%d)' % (s, abs(hp_delta), target.hp)
+                msg += " They %s %d damage (%d)" % (s, abs(hp_delta), target.hp)
 
         return msg
-
 
     async def _robust_edit(self, msg, content=None, embed=None):
         try:
@@ -1470,46 +1522,57 @@ class RPG(commands.Cog):
         except Exception:
             raise
 
-
     def to_shop_items(self, items, category):
         result = []
-        if category == 'weapon':
+        if category == "weapon":
             for item in items:
-                item['damage'] = f"{item['low']}-{item['high']}"
+                item["damage"] = f"{item['low']}-{item['high']}"
                 result.append(item)
 
             return result
 
-        if category == 'healing_item':
+        if category == "healing_item":
             for item in items:
-                item['healing'] = f"{item['low']}-{item['high']}"
+                item["healing"] = f"{item['low']}-{item['high']}"
                 result.append(item)
 
             return result
 
         return items
 
-
     def to_shop_row(self, item, category):
-        if category == 'weapon':
-            return [item['name'], item['damage'], str(int(item['hit_chance'] * 100)) + '%', str(int(item['crit_chance'] * 100)) + '%', item['cost']]
+        if category == "weapon":
+            return [
+                item["name"],
+                item["damage"],
+                str(int(item["hit_chance"] * 100)) + "%",
+                str(int(item["crit_chance"] * 100)) + "%",
+                item["cost"],
+            ]
 
-        if category == 'healing_item':
-            return [item['name'], item['healing'], item['cost']]
+        if category == "healing_item":
+            return [item["name"], item["healing"], item["cost"]]
 
-        return [item['name'], item['armor'], item['cost']]
-
+        return [item["name"], item["armor"], item["cost"]]
 
     def generate_header(self, category):
-        if category == 'weapon':
-            return [HR_STATS['name'], HR_STATS['damage'], HR_STATS['hit_chance'], HR_STATS['crit_chance'], HR_STATS['cost']]
+        if category == "weapon":
+            return [
+                HR_STATS["name"],
+                HR_STATS["damage"],
+                HR_STATS["hit_chance"],
+                HR_STATS["crit_chance"],
+                HR_STATS["cost"],
+            ]
 
-        if category == 'healing_item':
-            return [HR_STATS['name'], HR_STATS['healing'], HR_STATS['cost']]
+        if category == "healing_item":
+            return [HR_STATS["name"], HR_STATS["healing"], HR_STATS["cost"]]
 
-        return [HR_STATS['name'], HR_STATS['armor'], HR_STATS['cost']]
+        return [HR_STATS["name"], HR_STATS["armor"], HR_STATS["cost"]]
+
 
 # UTILS END
+
 
 def weighted_choice(choices):
     total = sum(w for c, w in choices.items())
