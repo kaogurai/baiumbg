@@ -63,7 +63,7 @@ class SFX(commands.Cog):
             await ctx.send("That's not a valid message, sorry.")
             return
 
-        if len(decoded_string) > 1000:
+        if len(decoded_string) > char_limit:
             await ctx.send(
                 f"Sorry, this voice has a limit of **{str(char_limit)}** characters."
             )
