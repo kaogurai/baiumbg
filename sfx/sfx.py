@@ -576,13 +576,7 @@ class SFX(commands.Cog):
         silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
-        try:
-            await self._play_sfx(message.author.voice.channel, audio_file, True)
-        except Exception:
-            await message.channel.send(
-                "Lavalink doesn't seem to be ready, please try again later."
-            )
-            return
+        await self._play_sfx(message.author.voice.channel, audio_file, True)
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
