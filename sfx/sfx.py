@@ -85,11 +85,7 @@ class SFX(commands.Cog):
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
 
-        try:
-            await self._play_sfx(ctx.author.voice.channel, audio_file, True)
-        except Exception:
-            await ctx.send("Lavalink doesn't seem to be ready, please try again later.")
-            return
+        await self._play_sfx(ctx.author.voice.channel, audio_file, True)
 
     @commands.command()
     @commands.cooldown(
