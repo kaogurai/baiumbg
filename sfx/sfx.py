@@ -84,8 +84,10 @@ class SFX(commands.Cog):
         silence = pydub.AudioSegment.silent(duration=750)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
-
-        await self._play_sfx(ctx.author.voice.channel, audio_file, True)
+        try:
+            await self._play_sfx(ctx.author.voice.channel, audio_file, True)
+        except IndexError:
+            await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
 
     @commands.command()
     @commands.cooldown(
@@ -155,9 +157,11 @@ class SFX(commands.Cog):
                     return
             else:
                 await ctx.send("Sorry, I can't seem to find that SFX.")
-
-        await self._play_sfx(ctx.author.voice.channel, filepath)
-
+        try:
+            await self._play_sfx(ctx.author.voice.channel, filepath)
+        except IndexError:
+            await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
+            
     @commands.command()
     @commands.admin_or_permissions(manage_guild=True)
     @commands.guild_only()
@@ -576,7 +580,10 @@ class SFX(commands.Cog):
         silence = pydub.AudioSegment.silent(duration=500)
         padded_audio = silence + audio_data
         padded_audio.export(audio_file)
-        await self._play_sfx(message.author.voice.channel, audio_file, True)
+        try:
+            await self._play_sfx(message.author.voice.channel, audio_file, True)
+        except IndexError:
+            await message.channel.send("Please try again later, lavalink doesn't seem to be ready.")
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
