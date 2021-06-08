@@ -87,7 +87,7 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(ctx.author.voice.channel, audio_file, True)
         except Exception:
-            await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
+            await ctx.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
 
     @commands.command()
     @commands.cooldown(
@@ -160,7 +160,7 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(ctx.author.voice.channel, filepath)
         except Exception:
-            await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
+            await ctx.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
             
     @commands.command()
     @commands.admin_or_permissions(manage_guild=True)
@@ -583,7 +583,7 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(message.author.voice.channel, audio_file, True)
         except Exception:
-            await message.channel.send("Please try again later, lavalink doesn't seem to be ready.")
+            await message.channel.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)
