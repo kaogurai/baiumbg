@@ -86,7 +86,7 @@ class SFX(commands.Cog):
         padded_audio.export(audio_file)
         try:
             await self._play_sfx(ctx.author.voice.channel, audio_file, True)
-        except IndexError:
+        except Exception:
             await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
 
     @commands.command()
@@ -159,7 +159,7 @@ class SFX(commands.Cog):
                 await ctx.send("Sorry, I can't seem to find that SFX.")
         try:
             await self._play_sfx(ctx.author.voice.channel, filepath)
-        except IndexError:
+        except Exception:
             await ctx.send("Please try again later, lavalink doesn't seem to be ready.")
             
     @commands.command()
@@ -582,7 +582,7 @@ class SFX(commands.Cog):
         padded_audio.export(audio_file)
         try:
             await self._play_sfx(message.author.voice.channel, audio_file, True)
-        except IndexError:
+        except Exception:
             await message.channel.send("Please try again later, lavalink doesn't seem to be ready.")
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
