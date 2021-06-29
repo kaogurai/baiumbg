@@ -387,7 +387,11 @@ class SFX(commands.Cog):
         if global_sounds:
             txt += "\n**Global Sounds**:\n"
             for sound in global_sounds:
-                txt += sound + "\n"
+                if guild_sounds:
+                    if sound in guild_sounds:
+                        txt += sound + " (overridden)\n"
+                    else:
+                        txt += sound + "\n"
 
         pages = [p for p in pagify(text=txt, delims="\n")]
 
