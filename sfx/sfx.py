@@ -380,12 +380,12 @@ class SFX(commands.Cog):
         txt = ""
 
         if guild_sounds:
-            txt += "Guild Sounds:\n"
+            txt += "**Guild Sounds**:\n"
             for sound in guild_sounds:
                 txt += sound + "\n"
 
         if global_sounds:
-            txt += "Global Sounds:\n"
+            txt += "\n**Global Sounds**:\n"
             for sound in global_sounds:
                 txt += sound + "\n"
 
