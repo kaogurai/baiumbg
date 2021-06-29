@@ -392,6 +392,8 @@ class SFX(commands.Cog):
                         txt += sound + " (overridden)\n"
                     else:
                         txt += sound + "\n"
+                else:
+                    txt += sound + "\n"
 
         pages = [p for p in pagify(text=txt, delims="\n")]
 
