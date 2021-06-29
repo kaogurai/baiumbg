@@ -1,7 +1,8 @@
-from redbot.core import commands
-import discord
-import re
 import math
+import re
+
+import discord
+from redbot.core import commands
 
 
 def slowExponent(x):

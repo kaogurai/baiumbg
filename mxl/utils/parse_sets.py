@@ -1,7 +1,8 @@
-import requests
-from bs4 import BeautifulSoup
 import pprint
 import re
+
+import requests
+from bs4 import BeautifulSoup
 
 set_subname_regex = re.compile(r"\(.*\)")
 

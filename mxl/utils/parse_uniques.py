@@ -1,6 +1,7 @@
+import pprint
+
 import requests
 from bs4 import BeautifulSoup
-import pprint
 
 
 def clean(span_text):

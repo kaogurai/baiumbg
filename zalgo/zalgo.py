@@ -1,5 +1,6 @@
+from random import choice, randint, sample
+
 from redbot.core import commands
-from random import randint, choice, sample
 
 ZALGO_DEFAULT_AMT = 3
 ZALGO_MAX_AMT = 7

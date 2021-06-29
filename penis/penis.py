@@ -1,14 +1,15 @@
-from redbot.core import commands, checks, Config
-from redbot.core.utils.chat_formatting import pagify
-import discord
 import random
+
+import discord
+from redbot.core import Config, checks, commands
+from redbot.core.utils.chat_formatting import pagify
 
 
 class Penis(commands.Cog):
     """Penis related commands."""
 
     def __init__(self):
-        default_config = {'king_dong': 134621854878007296}
+        default_config = {"king_dong": 134621854878007296}
         self._config = Config.get_conf(self, identifier=134621854878007300)
         self._config.register_global(**default_config)
 
@@ -16,7 +17,7 @@ class Penis(commands.Cog):
     @checks.is_owner()
     async def set_king_dong(self, ctx, user: discord.Member):
         """Sets the king dong
-        
+
         Totally not cheating because you rolled a 0 dick length."""
 
         await self._config.king_dong.set(user.id)

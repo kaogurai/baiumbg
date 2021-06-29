@@ -4,30 +4,30 @@
 # Additional moves suggested by OrdinatorStouff
 
 import asyncio
-import discord
-from functools import partial
 import math
 import os
 import random
-import tabulate
 import re
+from functools import partial
 
-from redbot.core import checks, commands, Config, bank
+import discord
+import tabulate
+from redbot.core import Config, bank, checks, commands
 from redbot.core.utils.chat_formatting import error, pagify, warning
 
 from .items import (
+    ARMOR_PIECE_TO_BODY_PARTS,
+    ARMOR_PIECES,
     DEFAULT_BODY_ARMORS,
     DEFAULT_BOOTS,
+    DEFAULT_EQUIPPED,
     DEFAULT_GLOVES,
     DEFAULT_HEALING_ITEMS,
     DEFAULT_HELMETS,
+    DEFAULT_ITEMS,
     DEFAULT_PANTS,
     DEFAULT_SHOULDERS,
     DEFAULT_WEAPONS,
-    ARMOR_PIECES,
-    ARMOR_PIECE_TO_BODY_PARTS,
-    DEFAULT_EQUIPPED,
-    DEFAULT_ITEMS,
 )
 
 __version__ = "2.0.0"

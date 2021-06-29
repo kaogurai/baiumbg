@@ -1,35 +1,37 @@
-from redbot.core import commands, checks, Config, data_manager
-from redbot.core.utils.chat_formatting import pagify
-import discord
-import random
-import aiohttp
-import re
-import enum
-import urllib
-import flickrapi
 import concurrent.futures
+import enum
+import random
+import re
+import urllib
+
+import aiohttp
+import discord
+import flickrapi
 from bs4 import BeautifulSoup
-from .pastebin import PasteBin
+from redbot.core import Config, checks, commands, data_manager
+from redbot.core.utils.chat_formatting import pagify
+
 from .constants import (
-    SU_ITEMS,
-    SSU_ITEMS,
-    SSSU_ITEMS,
-    SETS,
     AMULETS,
-    RINGS,
-    JEWELS,
-    MOS,
-    RUNEWORDS,
-    IGNORED_ITEMS,
-    SHRINE_VESSELS,
-    MISC_ITEMS,
-    VESSEL_TO_SHRINE,
-    QUIVERS,
     CHARMS,
-    TROPHIES,
     DEFAULT_TRADE_POST_TEMPLATE,
+    IGNORED_ITEMS,
+    JEWELS,
+    MISC_ITEMS,
+    MOS,
+    QUIVERS,
+    RINGS,
+    RUNEWORDS,
+    SETS,
+    SHRINE_VESSELS,
+    SSSU_ITEMS,
+    SSU_ITEMS,
+    SU_ITEMS,
+    TROPHIES,
+    VESSEL_TO_SHRINE,
 )
 from .dclasses import ItemDump, PostGenerationErrors
+from .pastebin import PasteBin
 
 
 class LoginError(enum.Enum):

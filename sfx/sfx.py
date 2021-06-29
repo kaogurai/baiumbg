@@ -1,13 +1,16 @@
-from redbot.core import commands, checks, data_manager, Config
-from .api import TTSAPI
-import tempfile
-import discord
+import datetime
 import os
 import random
-import lavalink
+import tempfile
+
 import aiohttp
+import discord
+import lavalink
 import pydub
-import datetime
+from redbot.core import Config, checks, commands, data_manager
+from redbot.core.utils.chat_formatting import pagify
+
+from .api import TTSAPI
 
 
 class SFX(commands.Cog):
@@ -87,7 +90,9 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(ctx.author.voice.channel, audio_file, True)
         except Exception:
-            await ctx.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
+            await ctx.send(
+                "Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly."
+            )
 
     @commands.command()
     @commands.cooldown(
@@ -160,8 +165,10 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(ctx.author.voice.channel, filepath)
         except Exception:
-            await ctx.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
-            
+            await ctx.send(
+                "Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly."
+            )
+
     @commands.command()
     @commands.admin_or_permissions(manage_guild=True)
     @commands.guild_only()
@@ -357,7 +364,7 @@ class SFX(commands.Cog):
     @commands.guild_only()
     async def listsfx(self, ctx):
         """
-        Prints all available sounds for this server.
+        Lists all available sounds for this server.
         """
 
         if str(ctx.guild.id) not in os.listdir(self.sound_base):
@@ -370,23 +377,22 @@ class SFX(commands.Cog):
             await ctx.send(f"No sounds found. Use `{ctx.prefix}addsfx` to add one.")
             return
 
-        guild_paginator = discord.ext.commands.help.Paginator()
-        global_paginator = discord.ext.commands.help.Paginator()
-        for soundname, filepath in guild_sounds.items():
-            guild_paginator.add_line(soundname)
-        for soundname, filepath in global_sounds.items():
-            global_paginator.add_line(soundname)
+        txt = ""
 
-        await ctx.send("Guild sounds for this server:")
-        for page in guild_paginator.pages:
+        if guild_sounds:
+            txt += "Guild Sounds:\n"
+            for sound in guild_sounds:
+                txt += sound + "\n"
+
+        if global_sounds:
+            txt += "Global Sounds:\n"
+            for sound in global_sounds:
+                txt += sound + "\n"
+
+        pages = [p for p in pagify(text=txt, delims="\n")]
+
+        for page in pages:
             await ctx.send(page)
-        if not guild_paginator.pages:
-            await ctx.send("```None```")
-        await ctx.send("Global sounds for this server:")
-        for page in global_paginator.pages:
-            await ctx.send(page)
-        if not global_paginator.pages:
-            await ctx.send("```None```")
 
     @commands.command(aliases=["setvoice"])
     async def myvoice(self, ctx, voice: str = None):
@@ -583,7 +589,9 @@ class SFX(commands.Cog):
         try:
             await self._play_sfx(message.author.voice.channel, audio_file, True)
         except Exception:
-            await message.channel.send("Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly.")
+            await message.channel.send(
+                "Oops, an error occured. It's likely that lavalink (the audio backend) isn't working properly."
+            )
 
     async def _play_sfx(self, vc, filepath, is_tts=False):
         player = await lavalink.connect(vc)

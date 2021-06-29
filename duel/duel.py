@@ -4,13 +4,13 @@
 # Additional moves suggested by OrdinatorStouff
 
 import asyncio
-import discord
-from functools import partial
 import math
 import os
 import random
+from functools import partial
 
-from redbot.core import checks, commands, Config, bank
+import discord
+from redbot.core import Config, bank, checks, commands
 from redbot.core.utils.chat_formatting import error, pagify, warning
 
 __version__ = "1.6.0"

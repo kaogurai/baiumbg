@@ -1,6 +1,7 @@
+import urllib.parse
+
 import aiofiles
 import aiohttp
-import urllib.parse
 
 
 class TTSAPI:
