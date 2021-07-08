@@ -52,7 +52,6 @@ class SFX(commands.Cog):
 
         audio_file = os.path.join(
             tempfile.gettempdir(),
-            "tts/",
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".mp3",
         )
         author_voice = await self.config.user(ctx.author).voice()
@@ -559,7 +558,6 @@ class SFX(commands.Cog):
 
         audio_file = os.path.join(
             tempfile.gettempdir(),
-            "tts/",
             "".join(random.choice("0123456789ABCDEF") for i in range(15)) + ".wav",
         )
         author_voice = await self.config.user(message.author).voice()
